@@ -45,7 +45,9 @@ public class Registration extends HttpServlet {
         Document customer = new Document()
                 .append("FName", request.getParameter("fname"))
                 .append("LName", request.getParameter("lname"))
-                .append("SNumber", request.getParameter("snumber"));
+                .append("SNumber", request.getParameter("snumber"))
+                .append("Password", request.getParameter("password"));
+
 
         createCustomer(customer);
 
