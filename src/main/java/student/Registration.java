@@ -1,3 +1,5 @@
+package student;
+
 import com.mongodb.client.*;
 import org.bson.Document;
 
@@ -12,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 
-@WebServlet (name = "Registration", value = "/registration")
+@WebServlet (name = "student.Registration", value = "/registration")
 
 public class Registration extends HttpServlet {
 
@@ -58,8 +60,8 @@ public class Registration extends HttpServlet {
     public void createCustomer(Document customer) {
         // Use try-with-resources to ensure connection is closed
         try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
-            MongoDatabase database = mongo.getDatabase("dbStudents");
-            MongoCollection<Document> collection = database.getCollection("Collection_Registration");
+            MongoDatabase database = mongo.getDatabase("dbLibraryMS");
+            MongoCollection<Document> collection = database.getCollection("Students");
             collection.insertOne(customer);
             System.out.println("Document inserted: " + customer.toJson());
         } catch (Exception e) {

@@ -1,0 +1,300 @@
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.mongodb.client.*, org.bson.Document, java.util.ArrayList, java.util.List" %>
+<%
+    // Check if admin is logged in
+    Boolean adminLoggedIn = (Boolean) session.getAttribute("adminLoggedIn");
+    if (adminLoggedIn == null || !adminLoggedIn) {
+        response.sendRedirect(request.getContextPath() + "/admin/login");
+        return;
+    }
+
+    String adminUsername = (String) session.getAttribute("adminUsername");
+    String adminRole = (String) session.getAttribute("adminRole");
+
+    // Fetch books from database
+    List<Document> books = new ArrayList<>();
+    try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
+        MongoDatabase database = mongo.getDatabase("LibraryMS");
+        MongoCollection<Document> collection = database.getCollection("Books");
+        collection.find().into(books);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - LibraryMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="<%= request.getContextPath() %>/css/generalStyling.css" rel="stylesheet" type="text/css">
+</head>
+<body class="admin-dashboard-page">
+<!-- Navigation -->
+<nav class="navbar admin-navbar">
+    <div class="nav-container">
+        <a href="<%= request.getContextPath() %>/staff/adminDashboard.jsp" class="brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>LibraryMS Admin</span>
+        </a>
+        <div class="nav-menu">
+            <span class="admin-user-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <%= adminUsername %> (<%= adminRole %>)
+            </span>
+            <a href="<%= request.getContextPath() %>/logout" class="nav-link">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Admin Dashboard Content -->
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>📚 Book Management</h1>
+        <button class="btn-add-book" onclick="openAddModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add New Book
+        </button>
+    </div>
+
+    <!-- Books Table -->
+    <div class="books-table-container">
+        <table class="books-table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Available</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (books.isEmpty()) { %>
+            <tr>
+                <td colspan="7" class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <p>No books in the library yet. Click "Add New Book" to get started.</p>
+                </td>
+            </tr>
+            <% } else {
+                for (Document book : books) { %>
+            <tr>
+                <td><strong><%= book.getString("title") %></strong></td>
+                <td><%= book.getString("author") %></td>
+                <td><%= book.getString("isbn") %></td>
+                <td><span class="category-badge"><%= book.getString("category") %></span></td>
+                <td><%= book.getInteger("quantity", 0) %></td>
+                <td><%= book.getInteger("available", 0) %></td>
+                <td class="action-buttons">
+                    <button class="btn-edit" onclick='openEditModal(<%= book.toJson() %>)'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit
+                    </button>
+                    <button class="btn-delete" onclick="deleteBook('<%= book.getObjectId("_id").toString() %>', '<%= book.getString("title") %>')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            <% } } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Book Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Book</h2>
+            <button class="modal-close" onclick="closeAddModal()">&times;</button>
+        </div>
+        <form action="<%= request.getContextPath() %> /model/addBook" method="post" id="addBookForm">
+            <div class="form-group">
+                <label class="form-label">Title <span class="required">*</span></label>
+                <input type="text" name="title" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Author <span class="required">*</span></label>
+                <input type="text" name="author" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">ISBN <span class="required">*</span></label>
+                <input type="text" name="isbn" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category <span class="required">*</span></label>
+                <select name="category" class="form-input" required>
+                    <option value="">Select Category</option>
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Science">Science</option>
+                    <option value="Technology">Technology</option>
+                    <option value="History">History</option>
+                    <option value="Biography">Biography</option>
+                    <option value="Reference">Reference</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publisher</label>
+                <input type="text" name="publisher" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publication Year</label>
+                <input type="number" name="publicationYear" class="form-input" min="1800" max="2025">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Quantity <span class="required">*</span></label>
+                    <input type="number" name="quantity" class="form-input" required min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Available <span class="required">*</span></label>
+                    <input type="number" name="available" class="form-input" required min="0" value="1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-input" rows="3"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+                <button type="submit" class="btn-submit">Add Book</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Book Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Book</h2>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form action="<%= request.getContextPath() %>/admin/updateBook" method="post" id="editBookForm">
+            <input type="hidden" name="bookId" id="edit_bookId">
+            <div class="form-group">
+                <label class="form-label">Title <span class="required">*</span></label>
+                <input type="text" name="title" id="edit_title" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Author <span class="required">*</span></label>
+                <input type="text" name="author" id="edit_author" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">ISBN <span class="required">*</span></label>
+                <input type="text" name="isbn" id="edit_isbn" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category <span class="required">*</span></label>
+                <select name="category" id="edit_category" class="form-input" required>
+                    <option value="">Select Category</option>
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Science">Science</option>
+                    <option value="Technology">Technology</option>
+                    <option value="History">History</option>
+                    <option value="Biography">Biography</option>
+                    <option value="Reference">Reference</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publisher</label>
+                <input type="text" name="publisher" id="edit_publisher" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publication Year</label>
+                <input type="number" name="publicationYear" id="edit_publicationYear" class="form-input" min="1800" max="2025">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Quantity <span class="required">*</span></label>
+                    <input type="number" name="quantity" id="edit_quantity" class="form-input" required min="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Available <span class="required">*</span></label>
+                    <input type="number" name="available" id="edit_available" class="form-input" required min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" id="edit_description" class="form-input" rows="3"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-submit">Update Book</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+        document.getElementById('addBookForm').reset();
+    }
+
+    function openEditModal(book) {
+        document.getElementById('edit_bookId').value = book._id.$oid;
+        document.getElementById('edit_title').value = book.title || '';
+        document.getElementById('edit_author').value = book.author || '';
+        document.getElementById('edit_isbn').value = book.isbn || '';
+        document.getElementById('edit_category').value = book.category || '';
+        document.getElementById('edit_publisher').value = book.publisher || '';
+        document.getElementById('edit_publicationYear').value = book.publicationYear || '';
+        document.getElementById('edit_quantity').value = book.quantity || 1;
+        document.getElementById('edit_available').value = book.available || 0;
+        document.getElementById('edit_description').value = book.description || '';
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        document.getElementById('editBookForm').reset();
+    }
+
+    function deleteBook(bookId, title) {
+        if (confirm('Are you sure you want to delete "' + title + '"?')) {
+            window.location.href = '<%= request.getContextPath() %>/admin/deleteBook?bookId=' + bookId;
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const addModal = document.getElementById('addModal');
+        const editModal = document.getElementById('editModal');
+        if (event.target == addModal) {
+            closeAddModal();
+        }
+        if (event.target == editModal) {
+            closeEditModal();
+        }
+    }
+</script>
+</body>
+</html>

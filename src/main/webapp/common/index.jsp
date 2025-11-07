@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System - Modern Digital Library</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="generalStyling.css" rel="stylesheet" type="text/css">
+    <link href="../css/generalStyling.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <!-- Navigation -->
@@ -25,7 +25,8 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#contact" class="nav-link">Contact</a>
-            <a href="registration.jsp" class="nav-btn">Get Started</a>
+            <a href="../student/registration.jsp" class="nav-btn">Get Started</a>
+            <a href="../student/login.jsp" class="nav-link">Sign In</a>
         </div>
     </div>
 </nav>
@@ -44,7 +45,7 @@
                 and transactions seamlessly with our intelligent platform.
             </p>
             <div class="hero-actions">
-                <a href="registration.jsp" class="btn btn-primary">
+                <a href="../student/registration.jsp" class="btn btn-primary">
                     Start Free Trial
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -104,15 +105,15 @@
         </div>
 
         <div class="features-grid">
-            <a href="registration.jsp" class="feature-card">
+            <a href="../student/registration.jsp" class="feature-card">
                 <div class="feature-image">
-                    <img src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&h=400&fit=crop" alt="User Registration">
+                    <img src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&h=400&fit=crop" alt="User student.Registration">
                     <div class="feature-overlay">
                         <span class="feature-tag">Essential</span>
                     </div>
                 </div>
                 <div class="feature-content">
-                    <h3 class="feature-title">Smart Registration</h3>
+                    <h3 class="feature-title">Smart student.Registration</h3>
                     <p class="feature-description">Streamlined onboarding process with instant verification and automated member card generation.</p>
                     <div class="feature-link">
                         Learn more
@@ -229,7 +230,7 @@
             <p class="cta-description">Join thousands of libraries worldwide using our platform</p>
         </div>
         <div class="cta-actions">
-            <a href="registration.jsp" class="btn btn-white">Get Started Free</a>
+            <a href="../student/registration.jsp" class="btn btn-white">Get Started Free</a>
             <a href="#contact" class="btn btn-outline">Contact Sales</a>
         </div>
     </div>
@@ -251,6 +252,14 @@
             <a href="#contact">Contact</a>
             <a href="#">Privacy</a>
             <a href="#">Terms</a>
+            <a href="<%= request.getContextPath() %>/admin/login" class="admin-portal-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Admin Portal
+            </a>
         </div>
         <p class="footer-copyright">© 2025 LibraryMS. Built with Jakarta EE & MongoDB. All rights reserved.</p>
     </div>

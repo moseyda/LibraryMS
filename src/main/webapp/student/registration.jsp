@@ -5,16 +5,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member Registration - LibraryMS</title>
+    <title>Member student.Registration - LibraryMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="generalStyling.css" rel="stylesheet" type="text/css">
+    <link href="../css/generalStyling.css" rel="stylesheet" type="text/css">
 
 </head>
 <body class="registration-page">
 <!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="index.jsp" class="brand">
+        <a href="../common/index.jsp" class="brand">
             <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -22,12 +22,12 @@
             <span>LibraryMS</span>
         </a>
         <div class="nav-menu">
-            <a href="index.jsp" class="nav-link">← Back to Home</a>
+            <a href="../common/index.jsp" class="nav-link">← Back to Home</a>
         </div>
     </div>
 </nav>
 
-<!-- Registration Content -->
+<!-- student.Registration Content -->
 <div class="registration-wrapper">
     <!-- Left Side - Information -->
     <div class="info-section">
@@ -35,7 +35,7 @@
         <h1 class="info-title">Start Your Journey With Us</h1>
         <p class="info-description">
             Become a member today and unlock access to thousands of books, digital resources,
-            and exclusive library services. Registration is quick, easy, and completely free!
+            and exclusive library services. student.Registration is quick, easy, and completely free!
         </p>
 
         <div class="info-features">
@@ -86,7 +86,7 @@
         </div>
     </div>
 
-    <!-- Right Side - Registration Form -->
+    <!-- Right Side - student.Registration Form -->
     <div class="form-container">
         <div class="form-header">
             <h2 class="form-title">Create Your Account</h2>
@@ -184,7 +184,7 @@
         </form>
 
         <div class="form-footer">
-            Already have an account? <a href="index.jsp">Sign in here</a>
+            Already have an account? <a href="../common/index.jsp">Sign in here</a>
         </div>
     </div>
 </div>
