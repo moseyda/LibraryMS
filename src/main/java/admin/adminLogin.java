@@ -1,4 +1,4 @@
-package staff;
+package admin;
 
 import com.mongodb.client.*;
 import org.bson.Document;
@@ -20,7 +20,7 @@ public class adminLogin extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/staff/adminLogin.jsp").forward(request, response);
+        request.getRequestDispatcher("/admin/adminLogin.jsp").forward(request, response);
     }
 
     @Override
@@ -50,11 +50,11 @@ public class adminLogin extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/staff/adminDashboard.jsp");
             } else {
                 request.setAttribute("errorMessage", "Your admin account is inactive. Please contact the system administrator.");
-                request.getRequestDispatcher("/staff/adminLogin.jsp").forward(request, response);
+                request.getRequestDispatcher("/admin/adminLogin.jsp").forward(request, response);
             }
         } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
-            request.getRequestDispatcher("/staff/adminLogin.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/adminLogin.jsp").forward(request, response);
         }
     }
 

@@ -35,7 +35,7 @@
             <a href="#" class="nav-link active">Dashboard</a>
             <a href="#" class="nav-link">My Books</a>
             <a href="#" class="nav-link">Browse</a>
-            <a href="<%= request.getContextPath() %>/logout" class="nav-link">student.Logout</a>
+            <a href="<%= request.getContextPath() %>/logout" class="nav-link">Logout</a>
         </div>
     </div>
 </nav>

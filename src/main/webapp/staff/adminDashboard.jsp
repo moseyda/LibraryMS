@@ -15,7 +15,7 @@
     // Fetch books from database
     List<Document> books = new ArrayList<>();
     try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
-        MongoDatabase database = mongo.getDatabase("LibraryMS");
+        MongoDatabase database = mongo.getDatabase("dbLibraryMS");
         MongoCollection<Document> collection = database.getCollection("Books");
         collection.find().into(books);
     } catch (Exception e) {
@@ -50,12 +50,16 @@
                 </svg>
                 <%= adminUsername %> (<%= adminRole %>)
             </span>
-            <a href="<%= request.getContextPath() %>/logout" class="nav-link">Logout</a>
+            <a href="<%= request.getContextPath() %>/admin/logout" class="nav-link">Logout</a>
         </div>
     </div>
 </nav>
 
 <!-- Admin Dashboard Content -->
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
 <div class="admin-container">
     <div class="admin-header">
         <h1>📚 Book Management</h1>
@@ -129,7 +133,7 @@
             <h2>Add New Book</h2>
             <button class="modal-close" onclick="closeAddModal()">&times;</button>
         </div>
-        <form action="<%= request.getContextPath() %> /model/addBook" method="post" id="addBookForm">
+        <form action="<%= request.getContextPath() %>/admin/addBook" method="post" id="addBookForm">
             <div class="form-group">
                 <label class="form-label">Title <span class="required">*</span></label>
                 <input type="text" name="title" class="form-input" required>
@@ -249,7 +253,111 @@
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content modal-small">
+        <div class="modal-header modal-header-danger">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h2>Confirm Deletion</h2>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this book?</p>
+            <p class="delete-book-title"></p>
+            <p class="warning-text">This action cannot be undone.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <button type="button" class="btn-delete-confirm" onclick="confirmDelete()">Delete Book</button>
+        </div>
+    </div>
+</div>
+
+
+
 <script>
+    let deleteBookId = null;
+    let deleteBookTitle = null;
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast toast-' + type + ' toast-show';
+
+        setTimeout(() => {
+            toast.className = 'toast';
+        }, 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Add Book Form
+        const addForm = document.getElementById('addBookForm');
+        addForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(addForm);
+            const params = new URLSearchParams(formData);
+
+            fetch('<%= request.getContextPath() %>/admin/addBook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString()
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('✓ Book added successfully!', 'success');
+                        closeAddModal();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        console.error('Add failed:', data.error);
+                        showToast('✗ Failed to add book: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('✗ Failed to add book. Please try again.', 'error');
+                });
+        });
+
+        // Handle Edit Book Form
+        const editForm = document.getElementById('editBookForm');
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(editForm);
+            const params = new URLSearchParams(formData);
+
+            fetch('<%= request.getContextPath() %>/admin/updateBook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString()
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('✓ Book updated successfully!', 'success');
+                        closeEditModal();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        console.error('Update failed:', data.error);
+                        showToast('✗ Failed to update book: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('✗ Failed to update book. Please try again.', 'error');
+                });
+        });
+    });
+
     function openAddModal() {
         document.getElementById('addModal').style.display = 'flex';
     }
@@ -279,22 +387,61 @@
     }
 
     function deleteBook(bookId, title) {
-        if (confirm('Are you sure you want to delete "' + title + '"?')) {
-            window.location.href = '<%= request.getContextPath() %>/admin/deleteBook?bookId=' + bookId;
-        }
+        deleteBookId = bookId;
+        deleteBookTitle = title;
+        document.querySelector('.delete-book-title').textContent = '"' + title + '"';
+        document.getElementById('deleteModal').style.display = 'flex';
     }
 
-    // Close modal when clicking outside
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+        deleteBookId = null;
+        deleteBookTitle = null;
+    }
+
+    function confirmDelete() {
+        if (!deleteBookId) return;
+
+        fetch('<%= request.getContextPath() %>/admin/deleteBook?bookId=' + deleteBookId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✓ Book deleted successfully!', 'success');
+                    closeDeleteModal();
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    console.error('Delete failed:', data.error);
+                    showToast('✗ Failed to delete book: ' + (data.error || 'Unknown error'), 'error');
+                    closeDeleteModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('✗ Failed to delete book. Please try again.', 'error');
+                closeDeleteModal();
+            });
+    }
+
     window.onclick = function(event) {
         const addModal = document.getElementById('addModal');
         const editModal = document.getElementById('editModal');
+        const deleteModal = document.getElementById('deleteModal');
+
         if (event.target == addModal) {
             closeAddModal();
         }
         if (event.target == editModal) {
             closeEditModal();
         }
+        if (event.target == deleteModal) {
+            closeDeleteModal();
+        }
     }
 </script>
+
+
+
+
+
 </body>
 </html>
