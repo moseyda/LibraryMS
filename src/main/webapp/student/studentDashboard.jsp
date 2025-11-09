@@ -83,9 +83,9 @@
                 <p>View borrowed items</p>
             </a>
             <a href="#" class="action-card">
-                <div class="action-icon">⭐</div>
-                <h3>Recommendations</h3>
-                <p>Personalized for you</p>
+                <div class="action-icon">📋</div>
+                <h3>Account History</h3>
+                <p>View borrow history</p>
             </a>
             <a href="#" class="action-card">
                 <div class="action-icon">👤</div>

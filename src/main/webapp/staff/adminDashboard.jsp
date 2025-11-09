@@ -42,6 +42,7 @@
             </svg>
             <span>LibraryMS Admin</span>
         </a>
+        <a href="#" class="nav-link" id="loansActivityLink">Loans Activity</a>
         <div class="nav-menu">
             <span class="admin-user-badge">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -276,6 +277,34 @@
     </div>
 </div>
 
+<!-- Loans Activity -->
+<section class="admin-container">
+    <div class="admin-header">
+        <h1>Loans Activity</h1>
+    </div>
+
+    <div class="books-table-container">
+        <table class="books-table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Borrower</th>
+                <th>Borrowed</th>
+                <th>Expected Return</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="loansTableBody">
+            <tr><td colspan="7" style="padding:1rem;color:#64748b;">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+
+
 
 
 <script>
@@ -438,6 +467,8 @@
         }
     }
 </script>
+<script>window.APP_CTX='${pageContext.request.contextPath}';</script>
+<script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>
 
 
 

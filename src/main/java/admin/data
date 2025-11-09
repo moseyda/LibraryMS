@@ -1,0 +1,340 @@
+{
+  "_id": {
+    "$oid": "6910ba6a7e764cd435a2fced"
+  },
+  "username": "admin",
+  "password": "admin123",
+  "role": "admin",
+  "createdAt": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "isActive": true
+}
+
+** Books **
+
+{
+  "_id": {
+    "$oid": "6910bb104aa03897e85c7bac"
+  },
+  "title": "The Secrets of the Quantum Realm",
+  "author": "Dr. Amelia Voss",
+  "isbn": "978-1-4028-9462-6",
+  "category": "Fiction",
+  "publisher": "Orion Press",
+  "publicationYear": 2022,
+  "quantity": 1,
+  "available": 1,
+  "description": "A thrilling exploration of parallel universes and hidden dimensions, The Secrets of the Quantum Realm follows physicist Lara Kent as she unlocks the mysteries of reality and faces the consequences of altering space-time itself.."
+}
+
+{
+  "_id": {
+    "$oid": "6910c0b04aa03897e85c7c81"
+  },
+  "title": "Chronicles of the Forgotten Kingdom",
+  "author": "Lucius Grey",
+  "isbn": "978-1-4028-9450-3",
+  "category": "Fantasy",
+  "publisher": "Elysian Press",
+  "publicationYear": 2018,
+  "quantity": 2,
+  "available": 1,
+  "description": "An epic tale of magic, betrayal, and destiny in a kingdom lost to time."
+}
+
+{
+  "_id": {
+    "$oid": "6910c1b24aa03897e85c7c92"
+  },
+  "title": "The Quantum Tapestry",
+  "author": "Sarah L. Whitmore",
+  "isbn": "978-0-618-9472-7",
+  "category": "Science Fiction",
+  "publisher": "Starfield Books",
+  "publicationYear": 2021,
+  "quantity": 3,
+  "available": 2,
+  "description": "A gripping journey through time and space where every thread of fate is woven into a grand design."
+}
+
+{
+  "_id": {
+    "$oid": "6910c2d14aa03897e85c7ca3"
+  },
+  "title": "Mysteries of the Abyss",
+  "author": "Eliot J. Hargrove",
+  "isbn": "978-1-555-6342-5",
+  "category": "Thriller",
+  "publisher": "Midnight Press",
+  "publicationYear": 2020,
+  "quantity": 1,
+  "available": 1,
+  "description": "A dark and suspenseful thriller that delves into the deepest secrets of the ocean's depths."
+}
+
+{
+  "_id": {
+    "$oid": "6910c3e64aa03897e85c7cb4"
+  },
+  "title": "Journey Beyond the Stars",
+  "author": "William T. Montgomery",
+  "isbn": "978-1-4039-7541-3",
+  "category": "Adventure",
+  "publisher": "Galactic Horizons Publishing",
+  "publicationYear": 2023,
+  "quantity": 5,
+  "available": 4,
+  "description": "An interstellar adventure that takes the reader across galaxies to uncover lost civilizations."
+}
+
+
+
+** borrow/return **
+
+
+{
+  "_id": {
+    "$oid": "6910d2bfdb1d548606334550"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:44:09.209Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d2f4db1d54860633455a"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:44:41.126Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d30ddb1d548606334563"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:47:17.553Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d3a7d44d54876486ff11"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:47:33.654Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d3cad44d54876486ff1a"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:52:11.569Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d4ce90ccdb74fa8c0329"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:52:35.232Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d4e790ccdb74fa8c0331"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:54:29.382Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d5588370b89584cb9c54"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:55:09.845Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d5815af50532f4724f1b"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T18:02:44.832Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910d746f24d1ded09bdaf85"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T18:02:59.748Z"
+  },
+  "status": "returned"
+}
+
+{
+  "_id": {
+    "$oid": "6910fdd4540a2b8861ece57e"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T20:47:47.775Z"
+  },
+  "status": "returned"
+}
+
+
+
+students
+
+
+{
+  "_id": {
+    "$oid": "6910b9394aa03897e85c7ba5"
+  },
+  "FName": "John",
+  "LName": "Doe",
+  "SNumber": "1234567",
+  "Password": "Johnny"
+}
