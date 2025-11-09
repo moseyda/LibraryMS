@@ -1580,6 +1580,62 @@ body.admin-dashboard-page {
     box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
 }
 
+
+/* Scoped overrides for the Browse Books modal */
+#booksModal { z-index: 2000; }
+
+#booksModal .modal-content {
+    width: 90%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+}
+
+#booksModal .close-modal {
+    color: #6b7280;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+#booksModal .close-modal:hover { color: #1f2937; }
+
+#booksModal .modal-body { overflow-y: auto; }
+#booksModal .search-bar { margin-bottom: 24px; }
+#booksModal .search-bar input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+#booksModal .search-bar input:focus { outline: none; border-color: #6366f1; }
+#booksModal .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+#booksModal .book-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+#booksModal .book-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+#booksModal .book-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+#booksModal .book-status.available { background-color: #d1fae5; color: #065f46; }
+#booksModal .book-status.unavailable { background-color: #fee2e2; color: #991b1b; }
+#booksModal .borrow-btn {
+    width: 100%; margin-top: 16px; padding: 10px;
+    background-color: #6366f1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+    transition: background-color 0.2s;
+}
+#booksModal .borrow-btn:hover:not(:disabled) { background-color: #4f46e5; }
+#booksModal .borrow-btn:disabled { background-color: #d1d5db; cursor: not-allowed; }
+
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-header {

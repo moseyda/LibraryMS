@@ -1,0 +1,23 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" build-on-make="true" name="LibraryMS">
+    <output-path>$PROJECT_DIR$/out/artifacts/LibraryMS</output-path>
+    <root id="root">
+      <element id="dir-copy" path="$PROJECT_DIR$" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="LibraryMS" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-sync:5.6.1" />
+          <element id="library" level="project" name="Maven: org.mongodb:bson:5.6.1" />
+          <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-core:5.6.1" />
+          <element id="library" level="project" name="Maven: org.mongodb:bson-record-codec:5.6.1" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.9" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-simple:2.0.9" />
+        </element>
+      </element>
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp" />
+    </root>
+  </artifact>
+</component>

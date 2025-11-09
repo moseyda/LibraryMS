@@ -18,7 +18,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - LibraryMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="../css/generalStyling.css" rel="stylesheet" type="text/css">
+    <link href="<%= request.getContextPath() %>/css/generalStyling.css" rel="stylesheet" type="text/css">
+
+
 </head>
 <body>
 <!-- Navigation -->
@@ -94,6 +96,27 @@
     </div>
 </div>
 
+<!-- Browse Books Modal -->
+<div id="booksModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📚 Browse Books</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search books by title, author, or ISBN...">
+            </div>
+            <div id="booksContainer" class="books-grid">
+                <div class="loading">Loading books...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 <!-- Footer -->
 <div class="footer">
     <div class="footer-content">
@@ -113,5 +136,8 @@
         <p class="footer-copyright">© 2025 LibraryMS. All rights reserved.</p>
     </div>
 </div>
+
+<script>window.APP_CTX = '<%= request.getContextPath() %>';</script>
+<script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>
 </body>
 </html>
