@@ -42,16 +42,20 @@
             </svg>
             <span>LibraryMS Admin</span>
         </a>
-        <a href="#" class="nav-link" id="loansActivityLink">Loans Activity</a>
         <div class="nav-menu">
-            <span class="admin-user-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
+            <div class="admin-user-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <%= adminUsername %> (<%= adminRole %>)
-            </span>
-            <a href="<%= request.getContextPath() %>/admin/logout" class="nav-link">Logout</a>
+
+            </div>
+            <a href="<%= request.getContextPath() %>/logout" id="logout">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                </svg>
+                Logout
+            </a>
         </div>
     </div>
 </nav>
@@ -91,7 +95,7 @@
             <% if (books.isEmpty()) { %>
             <tr>
                 <td colspan="7" class="empty-state">
-                    <div class="empty-icon">📚</div>
+                    <div class="empty-icon">🕮</div>
                     <p>No books in the library yet. Click "Add New Book" to get started.</p>
                 </td>
             </tr>

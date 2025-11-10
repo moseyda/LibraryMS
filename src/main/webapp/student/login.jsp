@@ -13,7 +13,7 @@
 <!-- Navigation -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="../common/index.jsp" class="brand">
+        <a href="<%= request.getContextPath() %>/src/main/webapp/common/index.jsp" class="brand">
             <svg class="brand-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -21,7 +21,7 @@
             <span>LibraryMS</span>
         </a>
         <div class="nav-menu">
-            <a href="../common/index.jsp" class="nav-link">← Back to Home</a>
+            <a href="<%= request.getContextPath() %>/src/main/webapp/common/index.jsp" class="nav-link">← Back to Home</a>
         </div>
     </div>
 </nav>
@@ -164,7 +164,7 @@
         </form>
 
         <div class="form-footer">
-            Don't have an account? <a href="./registration.jsp">Register here</a>
+            Don't have an account? <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp">Register here</a>
         </div>
     </div>
 </div>

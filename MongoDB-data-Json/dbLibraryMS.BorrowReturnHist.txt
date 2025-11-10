@@ -1,0 +1,260 @@
+[{
+  "_id": {
+    "$oid": "6910d2bfdb1d548606334550"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:44:09.209Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d2f4db1d54860633455a"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:44:41.126Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d30ddb1d548606334563"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:47:17.553Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d3a7d44d54876486ff11"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:47:33.654Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d3cad44d54876486ff1a"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:52:11.569Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d4ce90ccdb74fa8c0329"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:52:35.232Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d4e790ccdb74fa8c0331"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:54:29.382Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d5588370b89584cb9c54"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T17:55:09.845Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d5815af50532f4724f1b"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T18:02:44.832Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910d746f24d1ded09bdaf85"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T18:02:59.748Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6910fdd4540a2b8861ece57e"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-09T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-19T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-09T20:47:47.775Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "691143cb78aec672f17bea8a"
+  },
+  "isbn": "978-0-618-9472-7",
+  "title": "The Quantum Tapestry",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-10T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-30T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-10T01:46:58.150Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69114adb78aec672f17beac3"
+  },
+  "isbn": "978-1-4039-7541-3",
+  "title": "Journey Beyond the Stars",
+  "SNumber": "2025001",
+  "firstName": "John",
+  "lastName": "John",
+  "borrowDate": {
+    "$date": "2025-11-10T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-20T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-10T02:16:00.476Z"
+  },
+  "status": "returned"
+}]

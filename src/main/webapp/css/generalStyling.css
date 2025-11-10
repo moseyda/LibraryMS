@@ -2,6 +2,61 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #6366f1 #f1f5f9;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* Specific overrides for table containers */
+.books-table-container::-webkit-scrollbar,
+.loans-table-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.books-table-container::-webkit-scrollbar-track,
+.loans-table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin: 4px;
+}
+
+.books-table-container::-webkit-scrollbar-thumb,
+.loans-table-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+}
+
+.books-table-container::-webkit-scrollbar-thumb:hover,
+.loans-table-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* Firefox */
+.books-table-container,
+.loans-table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #6366f1 #f1f5f9;
 }
 
 body {
@@ -61,6 +116,43 @@ body {
     font-weight: 500;
     font-size: 0.95rem;
     transition: color 0.3s;
+}
+
+#logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: #fee2e2;
+    color: #991b1b !important;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+#logout:hover {
+    background: #dc2626;
+    color: white !important;
+}
+
+#logout:hover svg {
+    color: white;
+}
+
+#logout:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+#logout svg {
+    width: 20px;
+    height: 20px;
+    color: #991b1b;
+    stroke: currentColor;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -1168,7 +1260,7 @@ body.admin-dashboard-page {
 }
 
 .admin-navbar {
-    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+    background: #1E3A8AFF;
     border-bottom: none;
 }
 
@@ -1184,15 +1276,39 @@ body.admin-dashboard-page {
 .admin-user-badge {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    border-radius: 50px;
+    gap: 0.625rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: none;
+    border-radius: 12px;
     color: white;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: default;
 }
+
+.admin-user-badge:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.admin-user-badge svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.admin-user-badge .user-role {
+    font-size: 0.8125rem;
+    opacity: 0.85;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
 
 .admin-container {
     max-width: 1400px;
@@ -1362,6 +1478,60 @@ body.admin-dashboard-page {
     color: white;
 }
 
+/* Scrollable table containers */
+.books-table-container,
+.loans-table-container {
+    max-height: 350px;
+    overflow-y: auto;
+    position: relative;
+    border-radius: 16px;
+}
+
+.books-table-container thead,
+.loans-table-container thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Keep table header visible during scroll */
+.books-table thead th,
+.loans-table thead th {
+    background: #6366F1FF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Scrollbar Styling */
+.books-table-container::-webkit-scrollbar,
+.loans-table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.books-table-container::-webkit-scrollbar-track,
+.loans-table-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.books-table-container::-webkit-scrollbar-thumb,
+.loans-table-container::-webkit-scrollbar-thumb {
+    background: #6366F1FF;
+    border-radius: 8px;
+}
+
+.books-table-container::-webkit-scrollbar-thumb:hover,
+.loans-table-container::-webkit-scrollbar-thumb:hover {
+    background: #6366F1FF;
+}
+
+/* Firefox Scrollbar */
+.books-table-container,
+.loans-table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #8b5cf6 #f1f5f9;
+}
+
+
 
 /* ========================================
    MODAL STYLES
@@ -1406,7 +1576,7 @@ body.admin-dashboard-page {
     color: #1a1a1a;
 }
 
-.modal-close {
+.modal-close, .close-modal {
     background: none;
     border: none;
     font-size: 2rem;
@@ -1421,7 +1591,7 @@ body.admin-dashboard-page {
     transition: all 0.3s;
 }
 
-.modal-close:hover {
+.modal-close:hover, .close-modal:hover {
     background: #f1f5f9;
     color: #1a1a1a;
 }

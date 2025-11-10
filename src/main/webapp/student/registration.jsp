@@ -184,7 +184,7 @@
         </form>
 
         <div class="form-footer">
-            Already have an account? <a href="../common/index.jsp">Sign in here</a>
+            Already have an account? <a href="<%= request.getContextPath() %>/src/main/webapp/student/login.jsp">Sign in here</a>
         </div>
     </div>
 </div>
