@@ -284,7 +284,7 @@
 <!-- Loans Activity -->
 <section class="admin-container">
     <div class="admin-header">
-        <h1>Loans Activity</h1>
+        <h1>🕓 Loans Activity</h1>
     </div>
 
     <div class="books-table-container">
