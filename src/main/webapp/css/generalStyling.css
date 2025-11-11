@@ -911,6 +911,19 @@ body.registration-page {
     to { transform: rotate(360deg); }
 }
 
+/* Scrollbar inside expanded list (WebKit only) */
+select.form-input.custom-select::-webkit-scrollbar {
+    width: 10px;
+}
+select.form-input.custom-select::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+select.form-input.custom-select::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 8px;
+}
+
 /* ========================================
    LOGIN PAGE STYLES
    ======================================== */

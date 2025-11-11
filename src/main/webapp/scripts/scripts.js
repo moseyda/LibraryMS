@@ -490,5 +490,3 @@ function showToast(message, type = 'success') {
         }, 300);
     }, 3000);
 }
-
-

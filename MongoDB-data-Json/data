@@ -338,3 +338,56 @@ students
   "SNumber": "1234567",
   "Password": "Johnny"
 }
+
+
+
+/* Add New Book modal: keep header fixed, scroll only the body/form */
+#addModal, #editModal .modal-content {
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* prevent outer scrollbar on header */
+}
+
+/* Keep header visible, non‑scrolling */
+#addModal, #editModal .modal-header {
+    flex: 0 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #fff; /* so it doesn’t show content underneath while scrolling */
+}
+
+/* Make the form/body area scrollable */
+#addModal, #editModal .modal-content form,
+#addModal, #editModal .modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+/* WebKit scrollbar styling (inside body area only) */
+#addModal, #editModal .modal-content form::-webkit-scrollbar,
+#addModal, #editModal .modal-body::-webkit-scrollbar {
+    width: 10px;
+}
+#addModal, #editModal .modal-content form::-webkit-scrollbar-track,
+#addModal, #editModal .modal-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+#addModal, #editModal .modal-content form::-webkit-scrollbar-thumb,
+#addModal, #editModal .modal-body::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 8px;
+}
+#addModal, #editModal .modal-content form::-webkit-scrollbar-thumb:hover,
+#addModal, #editModal .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #4f46e5;
+}
+
+/* Firefox scrollbar */
+#addModal, #editModal .modal-content form,
+#addModal, #editModal.modal-body {
+    scrollbar-width: thin;
+    scrollbar-color: #6366f1 #f1f5f9;
+}

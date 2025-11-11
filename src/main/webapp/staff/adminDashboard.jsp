@@ -151,9 +151,9 @@
                 <label class="form-label">ISBN <span class="required">*</span></label>
                 <input type="text" name="isbn" class="form-input" required>
             </div>
-            <div class="form-group">
-                <label class="form-label">Category <span class="required">*</span></label>
-                <select name="category" class="form-input" required>
+            <div class="form-group select-wrapper">
+                <label class="form-label" for="add_category">Category <span class="required">*</span></label>
+                <select name="category" id="add_category" class="form-input custom-select" required>
                     <option value="">Select Category</option>
                     <option value="Fiction">Fiction</option>
                     <option value="Non-Fiction">Non-Fiction</option>
@@ -162,6 +162,28 @@
                     <option value="History">History</option>
                     <option value="Biography">Biography</option>
                     <option value="Reference">Reference</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Poetry">Poetry</option>
+                    <option value="Art & Design">Art & Design</option>
+                    <option value="Self-Help">Self-Help</option>
+                    <option value="Health & Wellness">Health & Wellness</option>
+                    <option value="Business & Economics">Business & Economics</option>
+                    <option value="Education">Education</option>
+                    <option value="Politics & Society">Politics & Society</option>
+                    <option value="Religion & Spirituality">Religion & Spirituality</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Children's Books">Children's Books</option>
+                    <option value="Young Adult">Young Adult</option>
+                    <option value="Comics & Graphic Novels">Comics & Graphic Novels</option>
+                    <option value="Cooking & Food">Cooking & Food</option>
+                    <option value="Environmental Studies">Environmental Studies</option>
                 </select>
             </div>
             <div class="form-group">
@@ -226,6 +248,28 @@
                     <option value="History">History</option>
                     <option value="Biography">Biography</option>
                     <option value="Reference">Reference</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Poetry">Poetry</option>
+                    <option value="Art & Design">Art & Design</option>
+                    <option value="Self-Help">Self-Help</option>
+                    <option value="Health & Wellness">Health & Wellness</option>
+                    <option value="Business & Economics">Business & Economics</option>
+                    <option value="Education">Education</option>
+                    <option value="Politics & Society">Politics & Society</option>
+                    <option value="Religion & Spirituality">Religion & Spirituality</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Children's Books">Children's Books</option>
+                    <option value="Young Adult">Young Adult</option>
+                    <option value="Comics & Graphic Novels">Comics & Graphic Novels</option>
+                    <option value="Cooking & Food">Cooking & Food</option>
+                    <option value="Environmental Studies">Environmental Studies</option>
                 </select>
             </div>
             <div class="form-group">
