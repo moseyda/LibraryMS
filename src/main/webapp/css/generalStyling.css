@@ -27,6 +27,10 @@
     background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
+*::-webkit-scrollbar-button {
+    display: none;
+}
+
 /* Specific overrides for table containers */
 .books-table-container::-webkit-scrollbar,
 .loans-table-container::-webkit-scrollbar {
@@ -922,6 +926,11 @@ select.form-input.custom-select::-webkit-scrollbar-track {
 select.form-input.custom-select::-webkit-scrollbar-thumb {
     background: #6366f1;
     border-radius: 8px;
+}
+
+.form-select {
+    max-height: 220px;
+    overflow-y: auto;
 }
 
 /* ========================================
