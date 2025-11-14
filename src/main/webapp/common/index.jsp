@@ -25,8 +25,8 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#contact" class="nav-link">Contact</a>
-            <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp" class="nav-btn">Get Started</a>
             <a href="<%= request.getContextPath() %>/src/main/webapp/student/login.jsp" class="nav-link">Sign In</a>
+            <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp" class="nav-btn">Get Started</a>
         </div>
     </div>
 </nav>

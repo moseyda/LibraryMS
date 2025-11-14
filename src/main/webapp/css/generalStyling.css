@@ -326,6 +326,7 @@ body {
     display: flex;
     gap: 1rem;
     animation: float 3s ease-in-out infinite;
+    cursor: default;
 }
 
 .card-1 {
