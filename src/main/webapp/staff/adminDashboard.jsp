@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="<%= request.getContextPath() %>/css/generalStyling.css" rel="stylesheet" type="text/css">
 </head>
-<body class="admin-dashboard-page">
+<body class="admin-dashboard-page" data-ctx="${pageContext.request.contextPath}">
 <!-- Navigation -->
 <nav class="navbar admin-navbar">
     <div class="nav-container">
@@ -64,6 +64,38 @@
 
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
+
+
+<section class="admin-container">
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">Total Copies</div>
+            <div class="kpi-value" id="kpiTotalBooks">—</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Available Now</div>
+            <div class="kpi-value" id="kpiAvailable">—</div>
+            <div class="kpi-sub" id="kpiAvailabilityRate">—</div>
+            <div class="kpi-progress"><span id="kpiAvailabilityBar"></span></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Active Loans</div>
+            <div class="kpi-value" id="kpiActiveLoans">—</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Overdue</div>
+            <div class="kpi-value" id="kpiOverdue">—</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">Borrow Activity (last 7 days)</div>
+        <canvas id="activityChart"></canvas>
+    </div>
+</section>
+
+
+
 
 <div class="admin-container">
     <div class="admin-header">
@@ -516,7 +548,7 @@
     }
 </script>
 <script>window.APP_CTX='${pageContext.request.contextPath}';</script>
-<script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>
+<script src="<%= request.getContextPath() %>/src/main/webapp/scripts/scripts.js"></script>
 
 
 

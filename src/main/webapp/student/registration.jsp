@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member student.Registration - LibraryMS</title>
+    <title>Member Registration - LibraryMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="../css/generalStyling.css" rel="stylesheet" type="text/css">
 
@@ -35,7 +35,7 @@
         <h1 class="info-title">Start Your Journey With Us</h1>
         <p class="info-description">
             Become a member today and unlock access to thousands of books, digital resources,
-            and exclusive library services. student.Registration is quick, easy, and completely free!
+            and exclusive library services. Registration is quick, easy, and completely free!
         </p>
 
         <div class="info-features">
@@ -59,29 +59,6 @@
                     <h3>Digital Resources</h3>
                     <p>Access e-books and audiobooks anytime, anywhere</p>
                 </div>
-            </div>
-        </div>
-
-        <div class="benefits-grid">
-            <div class="benefit-card">
-                <div class="benefit-card-icon">🎯</div>
-                <h4>Smart Recommendations</h4>
-                <p>AI-powered book suggestions based on your interests</p>
-            </div>
-            <div class="benefit-card">
-                <div class="benefit-card-icon">🔔</div>
-                <h4>Notifications</h4>
-                <p>Stay updated with due dates and new arrivals</p>
-            </div>
-            <div class="benefit-card">
-                <div class="benefit-card-icon">📱</div>
-                <h4>Mobile App</h4>
-                <p>Manage your account on the go</p>
-            </div>
-            <div class="benefit-card">
-                <div class="benefit-card-icon">🏆</div>
-                <h4>Rewards Program</h4>
-                <p>Earn points for every book you borrow</p>
             </div>
         </div>
     </div>

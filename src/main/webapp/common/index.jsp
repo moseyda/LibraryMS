@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System - Modern Digital Library</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="../css/generalStyling.css" rel="stylesheet" type="text/css">
+    <link href="<%= request.getContextPath() %>/src/main/webapp/css/generalStyling.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <!-- Navigation -->
@@ -21,18 +21,18 @@
             <span class="brand-text">LibraryMS</span>
         </a>
         <div class="nav-menu">
-            <a href="index.jsp" class="nav-link active">Home</a>
+            <a href="#hero" class="nav-link active">Home</a>
             <a href="#features" class="nav-link">Features</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#contact" class="nav-link">Contact</a>
-            <a href="../student/registration.jsp" class="nav-btn">Get Started</a>
-            <a href="../student/login.jsp" class="nav-link">Sign In</a>
+            <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp" class="nav-btn">Get Started</a>
+            <a href="<%= request.getContextPath() %>/src/main/webapp/student/login.jsp" class="nav-link">Sign In</a>
         </div>
     </div>
 </nav>
 
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero" id="hero">
     <div class="hero-content">
         <div class="hero-text">
             <span class="hero-badge">🚀 Next Generation Library System</span>
@@ -45,7 +45,7 @@
                 and transactions seamlessly with our intelligent platform.
             </p>
             <div class="hero-actions">
-                <a href="../student/registration.jsp" class="btn btn-primary">
+                <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp" class="btn btn-primary">
                     Start Free Trial
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -221,6 +221,136 @@
         </div>
     </div>
 </section>
+
+<!-- Services Section -->
+<section id="services" class="features" style="background:#ffffff;">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Our Services</span>
+            <h2 class="section-title">Library Services</h2>
+            <p class="section-description">Simple tools that help you discover, borrow, and manage books.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h3 class="feature-title">Borrow Books</h3>
+                    <p class="feature-description">Search titles and borrow instantly. Track due dates and extend time when allowed.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h3 class="feature-title">Return & Renew</h3>
+                    <p class="feature-description">Quick return process. Renew borrowed books if they are still available.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h3 class="feature-title">Registration</h3>
+                    <p class="feature-description">Create a student account to access personalized history and notifications.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h3 class="feature-title">Account History</h3>
+                    <p class="feature-description">Review all borrow and return activity with sortable, searchable records.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h3 class="feature-title">My Books</h3>
+                    <p class="feature-description">See what you currently have, return directly, or extend borrowing time.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-content">
+                    <h3 class="feature-title">Notifications</h3>
+                    <p class="feature-description">Stay informed on due dates, new arrivals, and important updates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Contact Section (replaces Getting Started) -->
+<section id="contact" class="contact-section" style="padding:120px 2rem;background:#ffffff;">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Contact</span>
+            <h2 class="section-title">Get in Touch</h2>
+            <p class="section-description">Questions about LibraryMS, reporting an issue, or suggesting a feature? Reach out and the team will respond promptly.</p>
+        </div>
+
+        <div class="contact-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2rem;">
+            <!-- Info Card -->
+            <div class="contact-card" style="background:#f8fafc;border:2px solid #e5e7eb;border-radius:20px;padding:2rem;display:flex;flex-direction:column;gap:1.25rem;">
+                <h3 style="margin:0;font-size:1.5rem;font-weight:700;color:#1a1a1a;">Support Channels</h3>
+                <p style="color:#64748b;line-height:1.6;">Reach us by email or send a quick message with the form. We typically respond within 1 business day.</p>
+                <div style="display:flex;flex-direction:column;gap:0.75rem;font-size:0.95rem;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <span style="width:40px;height:40px;border-radius:12px;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">@</span>
+                        <div>
+                            <strong>Email</strong><br>
+                            <a href="mailto:support@libraryms.local" style="color:#6366f1;text-decoration:none;">support@libraryms.local</a>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <span style="width:40px;height:40px;border-radius:12px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">⏱</span>
+                        <div>
+                            <strong>Hours</strong><br>
+                            Mon–Fri | 9:00–17:00
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <span style="width:40px;height:40px;border-radius:12px;background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">💬</span>
+                        <div>
+                            <strong>Response Time</strong><br>
+                            Usually within 24h
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <form action="${pageContext.request.contextPath}/contact" method="post" class="contact-card"
+                  style="background:#ffffff;border:2px solid #e5e7eb;border-radius:20px;padding:2rem;display:flex;flex-direction:column;gap:1rem;">
+                <h3 style="margin:0 0 0.25rem;font-size:1.5rem;font-weight:700;color:#1a1a1a;">Send a Message</h3>
+                <p style="color:#64748b;font-size:0.95rem;margin:0 0 1rem;">Fill in the details below and we will reply via email.</p>
+
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <label for="contactName" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Name *</label>
+                    <input id="contactName" name="name" type="text" required
+                           style="padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font:inherit;background:#f9fafb;">
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <label for="contactEmail" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Email *</label>
+                    <input id="contactEmail" name="email" type="email" required
+                           style="padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font:inherit;background:#f9fafb;">
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <label for="contactSubject" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Subject *</label>
+                    <input id="contactSubject" name="subject" type="text" required
+                           style="padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font:inherit;background:#f9fafb;">
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                    <label for="contactMessage" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Message *</label>
+                    <textarea id="contactMessage" name="message" rows="6" required
+                              style="padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font:inherit;resize:vertical;background:#f9fafb;"></textarea>
+                </div>
+
+                <button type="submit"
+                        style="margin-top:0.5rem;padding:1rem;border:none;border-radius:12px;font-weight:700;font-size:0.95rem;cursor:pointer;color:#fff;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);box-shadow:0 10px 25px rgba(99,102,241,0.25);">
+                    Send Message
+                </button>
+                <small style="color:#64748b;font-size:0.75rem;align-self:center;">We never share your details.</small>
+            </form>
+        </div>
+    </div>
+</section>
+
 
 <!-- CTA Section -->
 <section class="cta-section">

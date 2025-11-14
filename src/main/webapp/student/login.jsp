@@ -37,30 +37,6 @@
             explore new titles, and track your reading journey.
         </p>
 
-        <div class="info-features">
-            <div class="feature-item">
-                <div class="feature-icon">📚</div>
-                <div class="feature-text">
-                    <h3>Your Library</h3>
-                    <p>Access your borrowed books and reading history</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">⭐</div>
-                <div class="feature-text">
-                    <h3>Personalized</h3>
-                    <p>Get book recommendations based on your interests</p>
-                </div>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">🔔</div>
-                <div class="feature-text">
-                    <h3>Notifications</h3>
-                    <p>Stay updated with due dates and new arrivals</p>
-                </div>
-            </div>
-        </div>
-
         <div class="login-benefits">
             <div class="benefit-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -189,6 +165,23 @@
         input.addEventListener('focus', function() {
             this.style.borderColor = '#6366f1';
         });
+    });
+
+    //Toast Notification Script
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('registered') === '1') {
+            if (typeof showToast === 'function') {
+                showToast('Registration successful! Please log in.', 'success');
+            } else {
+                // Fallback minimal toast if global showToast not loaded
+                const t = document.createElement('div');
+                t.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:#fff;padding:12px 18px;border-radius:8px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:9999;';
+                t.textContent = 'Registration successful! Please log in.';
+                document.body.appendChild(t);
+                setTimeout(()=>t.remove(),3000);
+            }
+        }
     });
 </script>
 </body>

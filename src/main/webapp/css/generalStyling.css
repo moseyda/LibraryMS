@@ -1,3 +1,7 @@
+html {
+    scroll-behavior: smooth;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -629,9 +633,10 @@ body {
    ======================================== */
 
 /* student.Registration Page Body Override */
-body.registration-page {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
+body.registration-page .registration-wrapper {
+    display: grid;
+    grid-template-columns: 1fr minmax(420px, 520px);
+    align-items: center;
 }
 
 /* student.Registration Wrapper */
@@ -933,6 +938,54 @@ select.form-input.custom-select::-webkit-scrollbar-thumb {
     overflow-y: auto;
 }
 
+/* Keep form on the right (desktop) and stack on smaller screens */
+body.registration-page .info-section {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+body.registration-page .form-container {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    margin: 0;
+}
+
+@media (max-width: 1366px), (max-height: 900px) {
+    body.login-page { padding-top: 96px; }
+
+    .login-wrapper {
+        gap: 2rem;
+        align-items: flex-start;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+        max-height: calc(100vh - 160px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .form-header { margin-bottom: 1rem; }
+    .form-title { font-size: 1.75rem; }
+    .form-subtitle { font-size: 0.95rem; }
+
+    .registration-form,
+    .login-form { gap: 0.9rem; }
+
+    .form-group { gap: 0.4rem; }
+    .form-input { padding: 0.75rem 1rem; }
+    .submit-btn { padding: 0.75rem; }
+    .form-footer { margin-top: 0.75rem; padding-top: 0.75rem; }
+}
+
+
+@media (max-width: 1024px) {
+    .form-container { max-height: calc(100vh - 180px); }
+}
+
+
+
 /* ========================================
    LOGIN PAGE STYLES
    ======================================== */
@@ -1039,6 +1092,24 @@ body.login-page {
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+    body.login-page {
+        padding-top: 84px;
+    }
+    .login-wrapper {
+        padding-top: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    body.login-page {
+        padding-top: 92px;
+    }
+    .form-container {
+        margin-top: 12px;
+    }
 }
 
 /* ========================================
@@ -1350,6 +1421,159 @@ body.admin-dashboard-page {
     font-weight: 800;
     color: #1a1a1a;
 }
+
+/* Admin Dashboard — Analytics Dashboard */
+.analytics {
+    margin: 2rem 0 1.25rem;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.kpi-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.kpi-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: #d1d5db;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+}
+
+.kpi-label {
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: .02em;
+}
+
+.kpi-value {
+    color: #111827;
+    font-weight: 800;
+    font-size: 2.125rem;
+    line-height: 1.1;
+    margin-top: .35rem;
+}
+
+.kpi-sub {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin-top: .35rem;
+}
+
+.kpi-progress {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: .6rem;
+}
+.kpi-progress span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    transition: width .35s ease;
+    border-radius: 6px;
+}
+
+.panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1rem 1rem 0.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.panel-header {
+    color: #111827;
+    font-weight: 800;
+    margin: 0 0 .25rem 0;
+    padding: .25rem .5rem .5rem .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.panel-header::before {
+    content: "";
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #6366f1;
+    display: inline-block;
+}
+
+#activityChart {
+    width: 100%;
+    height: 140px;
+    display: block;
+    border-radius: 12px;
+}
+
+/* Subtle separators inside chart area */
+.panel canvas {
+    background: linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(to bottom, rgba(241,245,249,0.9), rgba(241,245,249,0)) border-box;
+    border: 0 solid transparent;
+    border-radius: 12px;
+}
+
+
+@media (max-width: 1024px) {
+    .admin-dashboard-page .analytics {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: .5rem;
+    }
+
+    .admin-dashboard-page .analytics .kpi-grid {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 260px;
+        grid-template-columns: none;
+        gap: 1rem;
+        width: max-content;
+    }
+
+    .admin-dashboard-page .analytics .kpi-card {
+        min-width: 260px;
+    }
+
+
+    .admin-dashboard-page .analytics .panel {
+        min-width: 900px;
+        width: max-content;
+        margin-top: .75rem;
+    }
+
+    .admin-dashboard-page #activityChart {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .admin-dashboard-page .analytics .panel { min-width: 800px; }
+}
+
+
 
 .btn-add-book {
     display: flex;
