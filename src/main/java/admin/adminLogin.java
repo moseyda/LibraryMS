@@ -20,7 +20,7 @@ public class adminLogin extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/admin/adminLogin.jsp").forward(request, response);
+        request.getRequestDispatcher("/staff/adminLogin.jsp").forward(request, response);
     }
 
     @Override

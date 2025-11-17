@@ -632,6 +632,9 @@ body {
 /* ========================================
    REGISTRATION PAGE STYLES
    ======================================== */
+body.registration-page {
+    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+}
 
 /* student.Registration Page Body Override */
 body.registration-page .registration-wrapper {
