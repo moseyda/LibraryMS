@@ -118,6 +118,15 @@
         btn.classList.add('loading');
         btn.innerHTML = '<span>Authenticating...</span>';
     });
+
+    if (data.success) {
+        showToast('✓ Login successful!', 'success');
+        setTimeout(() => {
+            window.location.href = data.redirect;
+        }, 1500);
+    } else {
+        showToast('✗ ' + (data.error || 'Invalid credentials'), 'error');
+    }
 </script>
 </body>
 </html>

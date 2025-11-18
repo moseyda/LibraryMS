@@ -50,11 +50,11 @@ public class adminLogin extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/staff/adminDashboard.jsp");
             } else {
                 request.setAttribute("errorMessage", "Your admin account is inactive. Please contact the system administrator.");
-                request.getRequestDispatcher("/admin/adminLogin.jsp").forward(request, response);
+                request.getRequestDispatcher("/staff/adminLogin.jsp").forward(request, response);
             }
         } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
-            request.getRequestDispatcher("/admin/adminLogin.jsp").forward(request, response);
+            request.getRequestDispatcher("/staff/adminLogin.jsp").forward(request, response);
         }
     }
 
