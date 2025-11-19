@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Registration - LibraryMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="<%= request.getContextPath() %>/src/main/webapp/css/generalStyling.css" rel="stylesheet" type="text/css">
+    <link href="<%= request.getContextPath() %>/css/generalStyling.css" rel="stylesheet" type="text/css">
 
 </head>
 <body class="registration-page">
@@ -34,8 +34,7 @@
         <span class="info-badge">📚 Join Our Community</span>
         <h1 class="info-title">Start Your Journey With Us</h1>
         <p class="info-description">
-            Become a member today and unlock access to thousands of books, digital resources,
-            and exclusive library services. Registration is quick, easy, and completely free!
+            Registration is quick, easy, and completely free!
         </p>
 
         <div class="info-features">
@@ -67,7 +66,6 @@
     <div class="form-container">
         <div class="form-header">
             <h2 class="form-title">Create Your Account</h2>
-            <p class="form-subtitle">Fill in your details to get started</p>
         </div>
 
 
@@ -147,9 +145,6 @@
                             required
                     >
                 </div>
-                <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">
-                    Password must be at least 6 characters long
-                </p>
             </div>
 
             <button type="submit" class="submit-btn">

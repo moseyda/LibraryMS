@@ -60,11 +60,11 @@
             </div>
             <div class="hero-stats">
                 <div class="stat-item">
-                    <span class="stat-value">50K+</span>
+                    <span class="stat-value">100+</span>
                     <span class="stat-label">Books</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-value">10K+</span>
+                    <span class="stat-value">1K+</span>
                     <span class="stat-label">Members</span>
                 </div>
                 <div class="stat-item">

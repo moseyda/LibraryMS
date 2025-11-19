@@ -33,7 +33,7 @@
         <span class="info-badge">🔐 Welcome Back</span>
         <h1 class="info-title">Sign In to Your Account</h1>
         <p class="info-description">
-            Access your personalized library experience. Manage your borrowed books,
+            Manage your borrowed books,
             explore new titles, and track your reading journey.
         </p>
 
