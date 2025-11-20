@@ -1455,136 +1455,147 @@ body.admin-dashboard-page {
 .kpi-card {
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    position: relative;
-    overflow: hidden;
-    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-}
-
-.kpi-card::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+    transition: 0.25s ease;
 }
 
 .kpi-card:hover {
-    transform: translateY(-2px);
-    border-color: #d1d5db;
-    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.08);
+    transform: translateY(-5px);
+    box-shadow: 0 14px 35px rgba(0,0,0,0.12);
 }
 
 .kpi-label {
-    color: #64748b;
+    font-size: .9rem;
     font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: .02em;
+    color: #6b7280;
+    text-transform: uppercase;
 }
 
 .kpi-value {
-    color: #111827;
-    font-weight: 800;
-    font-size: 2.125rem;
-    line-height: 1.1;
-    margin-top: .35rem;
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: #1f2937;
+    margin-top: .3rem;
 }
 
 .kpi-sub {
+    font-size: .85rem;
     color: #6b7280;
-    font-size: 0.85rem;
-    margin-top: .35rem;
+    margin-top: .3rem;
 }
 
 .kpi-progress {
     height: 8px;
     background: #f1f5f9;
     border-radius: 6px;
-    overflow: hidden;
     margin-top: .6rem;
+    overflow: hidden;
 }
+
 .kpi-progress span {
     display: block;
     height: 100%;
     width: 0%;
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    transition: width .35s ease;
-    border-radius: 6px;
+    transition: .35s ease;
 }
 
 .panel {
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 1rem 1rem 0.5rem;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    border-radius: 20px;
+    padding: 1rem 1rem 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 .panel-header {
-    color: #111827;
     font-weight: 800;
-    margin: 0 0 .25rem 0;
-    padding: .25rem .5rem .5rem .5rem;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-}
-.panel-header::before {
-    content: "";
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #6366f1;
-    display: inline-block;
+    font-size: 1.2rem;
+    margin-bottom: .65rem;
 }
 
 #activityChart {
     width: 100%;
-    height: 140px;
-    display: block;
-    border-radius: 12px;
+    height: 260px !important;
+    border-radius: 16px;
+    background: #ffffff;
+    padding: 8px;
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.06);
 }
 
-/* Subtle separators inside chart area */
-.panel canvas {
-    background: linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(to bottom, rgba(241,245,249,0.9), rgba(241,245,249,0)) border-box;
-    border: 0 solid transparent;
-    border-radius: 12px;
+.chart-filter-container {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: .75rem;
 }
 
+.chart-filter-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: .85rem;
+    transition: 0.2s;
+}
+
+.chart-filter-btn:hover {
+    background: #e2e8f0;
+}
+
+.chart-filter-btn.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, .3);
+}
+
+
+.live-indicator {
+    font-size: 0.8rem;
+    margin-bottom: .5rem;
+    color: #4b5563;
+    display: flex;
+    gap: .35rem;
+    align-items: center;
+}
+
+.live-indicator::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 1.2s infinite;
+    box-shadow: 0 0 10px #10b981;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: .8; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.9); opacity: .8; }
+}
+
+/* ==========================================
+   Responsive Dashboard
+========================================== */
 
 @media (max-width: 1024px) {
-    .admin-dashboard-page .analytics {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: .5rem;
-    }
 
-    .admin-dashboard-page .analytics .kpi-grid {
-        display: grid;
+    .kpi-grid {
         grid-auto-flow: column;
         grid-auto-columns: 260px;
-        grid-template-columns: none;
-        gap: 1rem;
-        width: max-content;
+        overflow-x: auto;
     }
 
-    .admin-dashboard-page .analytics .kpi-card {
-        min-width: 260px;
-    }
-
-
-    .admin-dashboard-page .analytics .panel {
+    .panel {
         min-width: 900px;
         width: max-content;
-        margin-top: .75rem;
-    }
-
-    .admin-dashboard-page #activityChart {
-        width: 100%;
     }
 }
+
 
 @media (max-width: 768px) {
 

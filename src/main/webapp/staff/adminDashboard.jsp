@@ -30,6 +30,7 @@
     <title>Admin Dashboard - LibraryMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="<%= request.getContextPath() %>/css/generalStyling.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body class="admin-dashboard-page" data-ctx="${pageContext.request.contextPath}">
 <!-- Navigation -->
@@ -65,34 +66,51 @@
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
 
-
 <section class="admin-container">
+
+    <!-- KPI CARDS -->
     <div class="kpi-grid">
+
         <div class="kpi-card">
             <div class="kpi-label">Total Copies</div>
             <div class="kpi-value" id="kpiTotalBooks">—</div>
         </div>
+
         <div class="kpi-card">
             <div class="kpi-label">Available Now</div>
             <div class="kpi-value" id="kpiAvailable">—</div>
             <div class="kpi-sub" id="kpiAvailabilityRate">—</div>
             <div class="kpi-progress"><span id="kpiAvailabilityBar"></span></div>
         </div>
+
         <div class="kpi-card">
             <div class="kpi-label">Active Loans</div>
             <div class="kpi-value" id="kpiActiveLoans">—</div>
         </div>
+
         <div class="kpi-card">
             <div class="kpi-label">Overdue</div>
             <div class="kpi-value" id="kpiOverdue">—</div>
         </div>
+
     </div>
 
+    <!-- ACTIVITY CHART PANEL -->
     <div class="panel">
-        <div class="panel-header">Borrow Activity (last 7 days)</div>
-        <canvas id="activityChart"></canvas>
+        <div class="panel-header">Borrow Activity</div>
+
+        <div class="live-indicator">Live updating…</div>
+
+        <div class="chart-filter-container">
+            <button class="chart-filter-btn active" data-days="7">7 Days</button>
+            <button class="chart-filter-btn" data-days="14">14 Days</button>
+            <button class="chart-filter-btn" data-days="30">30 Days</button>
+        </div>
+        <div id="activityChart" style="width:100%; height:200px;"></div>
     </div>
+
 </section>
+
 
 
 

@@ -475,12 +475,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // Analytics Dashboard View - Admin Dashboard Page
-
-(function () {
-    // Only run on the admin dashboard page
+document.addEventListener('DOMContentLoaded', function () {
     if (!document.body.classList.contains('admin-dashboard-page')) return;
 
-    const ctxPath = (window.APP_CTX || '<%= request.getContextPath() %>');
+    const ctxPath = window.APP_CTX || '';
 
     const els = {
         total: document.getElementById('kpiTotalBooks'),
@@ -492,47 +490,65 @@ document.addEventListener('DOMContentLoaded', () => {
         chart: document.getElementById('activityChart')
     };
 
-    Promise.all([
-        fetch(ctxPath + '/browseBooks').then(r => r.ok ? r.json() : [] ).catch(() => []),
-        fetch(ctxPath + '/admin/loansActivity').then(r => r.ok ? r.json() : [] ).catch(() => [])
-    ]).then(([books, loans]) => {
-        // Totals from books
-        const totalCopies = books.reduce((sum, b) => sum + (Number(b.quantity || 0)), 0);
-        const availableCopies = books.reduce((sum, b) => sum + (Number(b.available || 0)), 0);
+    let activityChart = null;
+    let autoRefreshInterval = null;
 
-        // Active and overdue from loans
-        const activeLoans = loans.filter(l => String(l.status || '').toLowerCase() === 'borrowed');
-        const now = new Date();
-        const overdueLoans = activeLoans.filter(l => {
-            const exp = new Date(l.expectedReturnDate?.$date || l.expectedReturnDate);
-            return exp instanceof Date && !isNaN(exp) && exp < now;
-        });
+    fetchDataAndRender();
 
-        setNum(els.total, totalCopies);
-        setNum(els.available, availableCopies);
-        setNum(els.active, activeLoans.length);
-        setNum(els.overdue, overdueLoans.length);
+    // Auto-refresh every 30s
+    autoRefreshInterval = setInterval(fetchDataAndRender, 15000);
 
-        const rate = totalCopies > 0 ? Math.round((availableCopies / totalCopies) * 100) : 0;
-        els.rateText.textContent = rate + '% available';
-        els.rateBar.style.width = rate + '%';
+    async function fetchDataAndRender() {
+        try {
+            const [books, loans] = await Promise.all([
+                fetch(ctxPath + '/browseBooks').then(r => r.ok ? r.json() : [] ).catch(() => []),
+                fetch(ctxPath + '/admin/loansActivity').then(r => r.ok ? r.json() : [] ).catch(() => [])
+            ]);
 
-        drawActivityChart(els.chart, loans);
-    });
+            // --- KPIs ---
+            const totalCopies = books.reduce((sum, b) => sum + (Number(b.quantity || 0)), 0);
+            const availableCopies = books.reduce((sum, b) => sum + (Number(b.available || 0)), 0);
 
-    function setNum(el, n) { if (el) el.textContent = Number(n || 0).toLocaleString(); }
+            const activeLoans = loans.filter(l => String(l.status || '').toLowerCase() === 'borrowed');
+            const now = new Date();
+            const overdueLoans = activeLoans.filter(l => {
+                const exp = new Date(l.expectedReturnDate?.$date || l.expectedReturnDate);
+                return exp instanceof Date && !isNaN(exp) && exp < now;
+            });
 
-    function drawActivityChart(canvas, loans) {
-        if (!canvas) return;
+            setNum(els.total, totalCopies);
+            setNum(els.available, availableCopies);
+            setNum(els.active, activeLoans.length);
+            setNum(els.overdue, overdueLoans.length);
 
-        // Build 7 day buckets ending today
+            const rate = totalCopies > 0 ? Math.round((availableCopies / totalCopies) * 100) : 0;
+            els.rateText.textContent = `${rate}% available`;
+            els.rateBar.style.width = `${rate}%`;
+
+            // --- Chart ---
+            drawActivityChart(loans);
+
+        } catch (err) {
+            console.error('Failed to fetch dashboard data:', err);
+        }
+    }
+
+    function setNum(el, n) {
+        if (el) el.textContent = Number(n || 0).toLocaleString();
+    }
+
+    function drawActivityChart(loans) {
+        if (!els.chart) return;
+
+        // Prepare 7-day buckets ending today
         const today = new Date(); today.setHours(0,0,0,0);
         const days = Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(today); d.setDate(today.getDate() - (6 - i));
+            const d = new Date(today);
+            d.setDate(today.getDate() - (6 - i));
             return d;
         });
 
-        const counts = days.map((d, i) => {
+        const borrowsCounts = days.map(d => {
             const start = new Date(d);
             const end = new Date(d); end.setDate(start.getDate() + 1);
             return loans.filter(l => {
@@ -541,44 +557,52 @@ document.addEventListener('DOMContentLoaded', () => {
             }).length;
         });
 
-        const widthCSS = canvas.clientWidth || canvas.parentElement.clientWidth || 600;
-        const heightCSS = 120;
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
-        canvas.width = widthCSS * dpr;
-        canvas.height = heightCSS * dpr;
-        const ctx = canvas.getContext('2d');
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const returnsCounts = days.map(d => {
+            const start = new Date(d);
+            const end = new Date(d); end.setDate(start.getDate() + 1);
+            return loans.filter(l => {
+                const rd = l.actualReturnDate ? new Date(l.actualReturnDate?.$date || l.actualReturnDate) : null;
+                return rd && rd >= start && rd < end;
+            }).length;
+        });
 
-        const W = widthCSS, H = heightCSS;
-        ctx.clearRect(0, 0, W, H);
+        const labels = days.map(d => `${d.getMonth()+1}/${d.getDate()}`);
 
-        // Grid
-        ctx.strokeStyle = '#e5e7eb';
-        ctx.lineWidth = 1;
-        for (let i = 1; i <= 3; i++) {
-            const y = (H / 4) * i;
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        if (!activityChart) {
+            activityChart = echarts.init(els.chart);
         }
 
-        // Bars
-        const max = Math.max(1, ...counts);
-        const gap = 8;
-        const barW = (W - gap * (counts.length + 1)) / counts.length;
-        counts.forEach((v, i) => {
-            const x = gap + i * (barW + gap);
-            const h = (v / max) * (H - 22);
-            ctx.fillStyle = '#6366f1';
-            ctx.fillRect(x, H - h - 12, barW, h);
+        const option = {
+            color: ['#6366F1', '#10B981'],
+            tooltip: { trigger: 'axis', backgroundColor:'#111827', textStyle:{color:'#fff'} },
+            legend: { data:['Borrows','Returns'], textStyle:{color:'#374151'} },
+            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+            xAxis: { type: 'category', boundaryGap: false, data: labels, axisLine:{lineStyle:{color:'#475569'}}, axisTick:{show:false} },
+            yAxis: { type:'value', axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'rgba(203,213,225,0.35)'}} },
+            series: [
+                {
+                    name:'Borrows',
+                    type:'line',
+                    smooth:true,
+                    data:borrowsCounts,
+                    areaStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(99,102,241,0.45)'},{offset:1,color:'rgba(99,102,241,0)'}])},
+                    lineStyle:{width:3}
+                },
+                {
+                    name:'Returns',
+                    type:'line',
+                    smooth:true,
+                    data:returnsCounts,
+                    areaStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(16,185,129,0.45)'},{offset:1,color:'rgba(16,185,129,0)'}])},
+                    lineStyle:{width:3}
+                }
+            ]
+        };
 
-            // Labels
-            ctx.fillStyle = '#6b7280';
-            ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto';
-            const d = days[i];
-            const label = (d.getMonth() + 1) + '/' + d.getDate();
-            ctx.fillText(label, x, H - 2);
-        });
+        activityChart.setOption(option);
     }
-})();
+});
+
 
 // Toast Notification Function
 function showToast(message, type = 'success') {
