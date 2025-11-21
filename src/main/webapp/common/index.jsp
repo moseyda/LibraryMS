@@ -312,8 +312,9 @@
             </div>
 
             <!-- Form Card -->
-            <form action="${pageContext.request.contextPath}/contact" method="post" class="contact-card"
+            <form id="messageForm" action="${pageContext.request.contextPath}/common/sendMessage" method="post" class="contact-card"
                   style="background:#ffffff;border:2px solid #e5e7eb;border-radius:20px;padding:2rem;display:flex;flex-direction:column;gap:1rem;">
+
                 <h3 style="margin:0 0 0.25rem;font-size:1.5rem;font-weight:700;color:#1a1a1a;">Send a Message</h3>
                 <p style="color:#64748b;font-size:0.95rem;margin:0 0 1rem;">Fill in the details below and we will reply via email.</p>
 
@@ -324,8 +325,8 @@
                 </div>
 
                 <div style="display:flex;flex-direction:column;gap:0.5rem;">
-                    <label for="contactEmail" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Email *</label>
-                    <input id="contactEmail" name="email" type="email" required
+                    <label for="contactStudentNumber" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Student Number *</label>
+                    <input id="contactStudentNumber" name="studentNumber" type="text" placeholder="Student Number" required
                            style="padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font:inherit;background:#f9fafb;">
                 </div>
 
@@ -345,6 +346,7 @@
                         style="margin-top:0.5rem;padding:1rem;border:none;border-radius:12px;font-weight:700;font-size:0.95rem;cursor:pointer;color:#fff;background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);box-shadow:0 10px 25px rgba(99,102,241,0.25);">
                     Send Message
                 </button>
+
                 <small style="color:#64748b;font-size:0.75rem;align-self:center;">We never share your details.</small>
             </form>
         </div>
@@ -395,5 +397,7 @@
     </div>
 </footer>
 
+<script> window.APP_CTX = '<%= request.getContextPath() %>'; </script>
+<script src="<%= request.getContextPath() %>/src/main/webapp/scripts/scripts.js"></script>
 </body>
 </html>

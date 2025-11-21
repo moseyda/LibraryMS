@@ -491,19 +491,19 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     let activityChart = null;
-    let autoRefreshInterval = null;
+    let selectedDays = 7;
 
     fetchDataAndRender();
-
-    // Auto-refresh every 30s
-    autoRefreshInterval = setInterval(fetchDataAndRender, 15000);
 
     async function fetchDataAndRender() {
         try {
             const [books, loans] = await Promise.all([
-                fetch(ctxPath + '/browseBooks').then(r => r.ok ? r.json() : [] ).catch(() => []),
-                fetch(ctxPath + '/admin/loansActivity').then(r => r.ok ? r.json() : [] ).catch(() => [])
+                fetch(ctxPath + '/browseBooks').then(r => r.ok ? r.json() : []).catch(() => []),
+                fetch(ctxPath + '/admin/loansActivity').then(r => r.ok ? r.json() : []).catch(() => [])
             ]);
+
+            // Store for re-rendering on button click
+            window.__lastLoansData = loans;
 
             // --- KPIs ---
             const totalCopies = books.reduce((sum, b) => sum + (Number(b.quantity || 0)), 0);
@@ -526,7 +526,7 @@ document.addEventListener('DOMContentLoaded', function () {
             els.rateBar.style.width = `${rate}%`;
 
             // --- Chart ---
-            drawActivityChart(loans);
+            drawActivityChart(loans, selectedDays);
 
         } catch (err) {
             console.error('Failed to fetch dashboard data:', err);
@@ -537,20 +537,42 @@ document.addEventListener('DOMContentLoaded', function () {
         if (el) el.textContent = Number(n || 0).toLocaleString();
     }
 
-    function drawActivityChart(loans) {
+    // NEW: Filter button listeners
+    document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const days = Number(btn.dataset.days);
+
+            // Highlight active button
+            document.querySelectorAll('.chart-filter-btn')
+                .forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            selectedDays = days;
+
+            // Re-render chart using last fetched data
+            if (window.__lastLoansData) {
+                drawActivityChart(window.__lastLoansData, selectedDays);
+            }
+        });
+    });
+
+    function drawActivityChart(loans, daysRange = 7) {
         if (!els.chart) return;
 
-        // Prepare 7-day buckets ending today
-        const today = new Date(); today.setHours(0,0,0,0);
-        const days = Array.from({ length: 7 }, (_, i) => {
+        // Prepare buckets ending today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const days = Array.from({ length: daysRange }, (_, i) => {
             const d = new Date(today);
-            d.setDate(today.getDate() - (6 - i));
+            d.setDate(today.getDate() - (daysRange - 1 - i));
             return d;
         });
 
         const borrowsCounts = days.map(d => {
             const start = new Date(d);
-            const end = new Date(d); end.setDate(start.getDate() + 1);
+            const end = new Date(d);
+            end.setDate(start.getDate() + 1);
             return loans.filter(l => {
                 const bd = new Date(l.borrowDate?.$date || l.borrowDate);
                 return bd >= start && bd < end;
@@ -559,14 +581,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const returnsCounts = days.map(d => {
             const start = new Date(d);
-            const end = new Date(d); end.setDate(start.getDate() + 1);
+            const end = new Date(d);
+            end.setDate(start.getDate() + 1);
             return loans.filter(l => {
                 const rd = l.actualReturnDate ? new Date(l.actualReturnDate?.$date || l.actualReturnDate) : null;
                 return rd && rd >= start && rd < end;
             }).length;
         });
 
-        const labels = days.map(d => `${d.getMonth()+1}/${d.getDate()}`);
+        const labels = days.map(d => `${d.getMonth() + 1}/${d.getDate()}`);
 
         if (!activityChart) {
             activityChart = echarts.init(els.chart);
@@ -574,34 +597,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const option = {
             color: ['#6366F1', '#10B981'],
-            tooltip: { trigger: 'axis', backgroundColor:'#111827', textStyle:{color:'#fff'} },
-            legend: { data:['Borrows','Returns'], textStyle:{color:'#374151'} },
+            tooltip: { trigger: 'axis', backgroundColor: '#111827', textStyle: { color: '#fff' } },
+            legend: { data: ['Borrows', 'Returns'], textStyle: { color: '#374151' } },
             grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-            xAxis: { type: 'category', boundaryGap: false, data: labels, axisLine:{lineStyle:{color:'#475569'}}, axisTick:{show:false} },
-            yAxis: { type:'value', axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'rgba(203,213,225,0.35)'}} },
+            xAxis: { type: 'category', boundaryGap: false, data: labels, axisLine: { lineStyle: { color: '#475569' } }, axisTick: { show: false } },
+            yAxis: { type: 'value', axisLine: { lineStyle: { color: '#475569' } }, splitLine: { lineStyle: { color: 'rgba(203,213,225,0.35)' } } },
             series: [
                 {
-                    name:'Borrows',
-                    type:'line',
-                    smooth:true,
-                    data:borrowsCounts,
-                    areaStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(99,102,241,0.45)'},{offset:1,color:'rgba(99,102,241,0)'}])},
-                    lineStyle:{width:3}
+                    name: 'Borrows',
+                    type: 'line',
+                    smooth: true,
+                    data: borrowsCounts,
+                    areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(99,102,241,0.45)' }, { offset: 1, color: 'rgba(99,102,241,0)' }]) },
+                    lineStyle: { width: 3 }
                 },
                 {
-                    name:'Returns',
-                    type:'line',
-                    smooth:true,
-                    data:returnsCounts,
-                    areaStyle: {color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(16,185,129,0.45)'},{offset:1,color:'rgba(16,185,129,0)'}])},
-                    lineStyle:{width:3}
+                    name: 'Returns',
+                    type: 'line',
+                    smooth: true,
+                    data: returnsCounts,
+                    areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(16,185,129,0.45)' }, { offset: 1, color: 'rgba(16,185,129,0)' }]) },
+                    lineStyle: { width: 3 }
                 }
             ]
         };
-
+        activityChart.clear();
+        activityChart.resize();
         activityChart.setOption(option);
     }
 });
+
 
 
 // Toast Notification Function
@@ -622,3 +647,32 @@ function showToast(message, type = 'success') {
         }, 300);
     }, 3000);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('messageForm');
+    if (!form) return;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (submitBtn) submitBtn.disabled = true; // Disable button
+        const data = new URLSearchParams(new FormData(form));
+        fetch(window.APP_CTX + '/common/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: data
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    showToast('Message sent successfully!', 'success');
+                    form.reset();
+                } else {
+                    showToast(res.error, 'error');
+                }
+            })
+            .catch(() => showToast('Message sending failed', 'error'))
+            .finally(() => {
+                if (submitBtn) submitBtn.disabled = false;
+            });
+    });
+});
