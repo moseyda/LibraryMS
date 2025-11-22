@@ -113,7 +113,7 @@
                     </div>
                 </div>
                 <div class="feature-content">
-                    <h3 class="feature-title">Smart student.Registration</h3>
+                    <h3 class="feature-title">Smart Registration</h3>
                     <p class="feature-description">Streamlined onboarding process with instant verification and automated member card generation.</p>
                     <div class="feature-link">
                         Learn more
@@ -272,7 +272,7 @@
 </section>
 
 
-<!-- Contact Section (replaces Getting Started) -->
+<!-- Contact Section -->
 <section id="contact" class="contact-section" style="padding:120px 2rem;background:#ffffff;">
     <div class="container">
         <div class="section-header">
@@ -288,21 +288,21 @@
                 <p style="color:#64748b;line-height:1.6;">Reach us by email or send a quick message with the form. We typically respond within 1 business day.</p>
                 <div style="display:flex;flex-direction:column;gap:0.75rem;font-size:0.95rem;">
                     <div style="display:flex;align-items:center;gap:0.75rem;">
-                        <span style="width:40px;height:40px;border-radius:12px;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">@</span>
+                        <span style="width:40px;height:40px;border-radius:12px;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:default;user-select:none;">@</span>
                         <div>
                             <strong>Email</strong><br>
                             <a href="mailto:support@libraryms.local" style="color:#6366f1;text-decoration:none;">support@libraryms.local</a>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.75rem;">
-                        <span style="width:40px;height:40px;border-radius:12px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">⏱</span>
+                        <span style="width:40px;height:40px;border-radius:12px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:default;user-select:none;">⏱</span>
                         <div>
                             <strong>Hours</strong><br>
                             Mon–Fri | 9:00–17:00
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.75rem;">
-                        <span style="width:40px;height:40px;border-radius:12px;background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">💬</span>
+                        <span style="width:40px;height:40px;border-radius:12px;background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:default;user-select:none;">💬</span>
                         <div>
                             <strong>Response Time</strong><br>
                             Usually within 24h
@@ -326,7 +326,7 @@
 
                 <div style="display:flex;flex-direction:column;gap:0.5rem;">
                     <label for="contactStudentNumber" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Student Number *</label>
-                    <input id="contactStudentNumber" name="studentNumber" type="text" placeholder="Student Number" required
+                    <input id="contactStudentNumber" name="studentNumber" type="text" required
                            style="padding:0.875rem 1rem;border:2px solid #e5e7eb;border-radius:12px;font:inherit;background:#f9fafb;">
                 </div>
 

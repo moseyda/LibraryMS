@@ -676,3 +676,152 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
 });
+
+
+let currentMessages = [];
+let currentUser = null;
+
+// ------------------------
+// Modal Open / Close
+// ------------------------
+
+async function openMessagesModal() {
+    document.getElementById('messagesModal').style.display = 'flex';
+    await loadUsers();
+}
+
+function closeMessagesModal() {
+    document.getElementById('messagesModal').style.display = 'none';
+    currentUser = null;
+}
+
+// ------------------------
+// Load & Display Users
+// ------------------------
+
+async function loadUsers() {
+    try {
+        const response = await fetch(`${window.APP_CTX}/common/getMessages`);
+        const data = await response.json();
+
+        if (data.success) {
+            currentMessages = data.messages;
+            displayUsers();
+        }
+    } catch (error) {
+        console.error('Error loading messages:', error);
+    }
+}
+
+function displayUsers() {
+    const usersList = document.getElementById('usersList');
+    const grouped = {};
+
+    currentMessages.forEach(msg => {
+        if (!grouped[msg.studentNumber]) {
+            grouped[msg.studentNumber] = {
+                name: msg.name,
+                studentNumber: msg.studentNumber,
+                count: 0,
+                messages: []
+            };
+        }
+        grouped[msg.studentNumber].count++;
+        grouped[msg.studentNumber].messages.push(msg);
+    });
+
+    usersList.innerHTML = Object.values(grouped).map(user => `
+        <div class="user-item" data-id="${user.studentNumber}">
+            <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+            <div class="user-info">
+                <div class="user-name">${user.name}</div>
+                <div class="user-student-number">${user.studentNumber}</div>
+            </div>
+            <span class="user-badge">${user.count}</span>
+        </div>
+    `).join('');
+}
+
+// ------------------------
+// Selecting a User
+// ------------------------
+
+function selectUser(studentNumber, element) {
+    currentUser = studentNumber;
+
+    document.querySelectorAll('.user-item')
+        .forEach(item => item.classList.remove('active'));
+
+    element.classList.add('active');
+
+    const userMessages = currentMessages.filter(m => m.studentNumber === studentNumber);
+    const user = userMessages[0];
+
+    document.getElementById('chatHeader').innerHTML = `
+        <div class="chat-header-content">
+            <div class="chat-user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+            <div class="chat-user-info">
+                <h3>${user.name}</h3>
+                <p>Student: ${user.studentNumber}</p>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('chatBody').innerHTML = userMessages.map(msg => `
+        <div class="message-item">
+            <div class="message-subject">${msg.subject}</div>
+            <div class="message-text">${msg.message}</div>
+            <div class="message-meta">
+                <span class="message-time">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    ${new Date(msg.timestamp).toLocaleString()}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ------------------------
+// Search users
+// ------------------------
+
+function filterUsers() {
+    const search = document.getElementById('userSearch').value.toLowerCase();
+    const items = document.querySelectorAll('.user-item');
+
+    items.forEach(item => {
+        const name = item.querySelector('.user-name').textContent.toLowerCase();
+        const number = item.querySelector('.user-student-number').textContent.toLowerCase();
+        item.style.display = (name.includes(search) || number.includes(search)) ? 'flex' : 'none';
+    });
+}
+
+// ------------------------
+// Event Listeners
+// ------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Open modal button
+    const openBtn = document.getElementById('openMessagesBtn');
+    if (openBtn) {
+        openBtn.addEventListener('click', openMessagesModal);
+    }
+
+    // Search input
+    document.getElementById('userSearch')
+        .addEventListener('input', filterUsers);
+
+    // Delegate clicks on user list
+    document.getElementById('usersList')
+        .addEventListener('click', e => {
+            const item = e.target.closest('.user-item');
+            if (!item) return;
+            const id = item.getAttribute('data-id');
+            selectUser(id, item);
+        });
+});
+

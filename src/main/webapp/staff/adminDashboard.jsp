@@ -66,6 +66,50 @@
 <!-- Toast Notification -->
 <div id="toast" class="toast"></div>
 
+<button class="btn-messages" onclick="openMessagesModal()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+</button>
+
+
+<!-- Messages Modal -->
+<div id="messagesModal" class="modal">
+    <div class="modal-content messages-modal-content">
+        <div class="messages-container">
+            <!-- Left Panel - Users List -->
+            <div class="messages-users-panel">
+                <div class="messages-header">
+                    <h2>Messages</h2>
+                    <button class="close-modal" onclick="closeMessagesModal()">&times;</button>
+                </div>
+                <div class="messages-search">
+                    <input type="text" id="userSearch" placeholder="Search students..." onkeyup="filterUsers()">
+                </div>
+                <div class="messages-users-list" id="usersList">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Right Panel - Conversation -->
+            <div class="messages-chat-panel">
+                <div class="messages-chat-header" id="chatHeader">
+                    <div class="empty-chat-state">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <p>Select a student to view messages</p>
+                    </div>
+                </div>
+                <div class="messages-chat-body" id="chatBody">
+                    <!-- Messages appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <section class="admin-container">
 
     <!-- KPI CARDS -->
@@ -566,7 +610,7 @@
     }
 </script>
 <script>window.APP_CTX='${pageContext.request.contextPath}';</script>
-<script src="<%= request.getContextPath() %>/src/main/webapp/scripts/scripts.js"></script>
+<script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>
 
 
 
