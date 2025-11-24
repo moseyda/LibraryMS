@@ -1,0 +1,66 @@
+Next folder structure:
+
+
+
+src/main/java/
+ ├── admin/
+ ├── common/
+ ├── student/
+
+ ├── services/
+ │    ├── MessageService.java
+ │    ├── UserService.java
+ │    └── BookService.java
+
+ ├── dao/
+ │    ├── MessageDAO.java
+ │    ├── UserDAO.java
+ │    ├── BookDAO.java
+ │    ├── DAOFactory.java
+ │    ├── mongo/
+ │    │      ├── MongoMessageDAO.java
+ │    │      ├── MongoUserDAO.java
+ │    │      └── MongoBookDAO.java
+ │    └── sql/
+ │           ├── SQLMessageDAO.java
+ │           ├── SQLUserDAO.java
+ │           └── SQLBookDAO.java
+
+
+<---------- DAOFactory.java content ---------->
+
+package dao;
+
+import dao.mongo.*;
+import dao.sql.*;
+
+public class DAOFactory {
+
+    private static final String DB_TYPE = System.getProperty("db.type", "MONGO");
+
+    public static MessageDAO getMessageDAO() {
+        return DB_TYPE.equalsIgnoreCase("SQL")
+                ? new SQLMessageDAO()
+                : new MongoMessageDAO();
+    }
+
+    public static UserDAO getUserDAO() {
+        return DB_TYPE.equalsIgnoreCase("SQL")
+                ? new SQLUserDAO()
+                : new MongoUserDAO();
+    }
+
+    public static BookDAO getBookDAO() {
+        return DB_TYPE.equalsIgnoreCase("SQL")
+                ? new SQLBookDAO()
+                : new MongoBookDAO();
+    }
+}
+
+Run tomcat using these whichever apply:
+
+MongoDB:
+-Ddb.type=MONGO
+
+SQL:
+-Ddb.type=SQL
