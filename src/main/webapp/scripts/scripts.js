@@ -687,11 +687,13 @@ let currentUser = null;
 
 async function openMessagesModal() {
     document.getElementById('messagesModal').style.display = 'flex';
+    document.body.classList.add("no-scroll");
     await loadUsers();
 }
 
 function closeMessagesModal() {
     document.getElementById('messagesModal').style.display = 'none';
+    document.body.classList.remove("no-scroll");
     currentUser = null;
 }
 
@@ -759,6 +761,11 @@ function selectUser(studentNumber, element) {
 
     document.getElementById('chatHeader').innerHTML = `
         <div class="chat-header-content">
+            <button id="chatBackBtn" class="chat-back-btn" onclick="resetChatState()">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
             <div class="chat-user-avatar">${user.name.charAt(0).toUpperCase()}</div>
             <div class="chat-user-info">
                 <h3>${user.name}</h3>
@@ -782,6 +789,32 @@ function selectUser(studentNumber, element) {
             </div>
         </div>
     `).join('');
+}
+
+const backBtn = document.getElementById('chatBackBtn');
+if (backBtn) {
+    backBtn.style.display = 'flex';
+}
+
+
+function resetChatState() {
+    const chatBody = document.querySelector('.messages-chat-body');
+    const chatHeader = document.querySelector('.messages-chat-header');
+    const backBtn = document.getElementById('chatBackBtn');
+
+    // Hide back button
+    if (backBtn) {
+        backBtn.style.display = 'none';
+    }
+
+    // Reset to empty state
+    chatHeader.innerHTML = '<div class="empty-chat-state"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><p>Select a student to view messages</p></div>';
+    chatBody.innerHTML = '';
+
+    // Remove active class from all users
+    document.querySelectorAll('.user-item').forEach(item => {
+        item.classList.remove('active');
+    });
 }
 
 // ------------------------
