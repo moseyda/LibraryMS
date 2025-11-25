@@ -858,3 +858,356 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+
+// ==========================================
+// FINES MANAGEMENT
+// ==========================================
+
+let selectedOverdueLoans = [];
+
+function checkOverdueBooks() {
+    fetch(`${window.APP_CTX}/student/getOverdueLoans`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.overdueLoans && data.overdueLoans.length > 0) {
+                showFinesNotification(data.overdueLoans.length, data.overdueLoans.length * 10);
+            }
+        })
+        .catch(error => console.error('Error checking overdue books:', error));
+}
+
+function showFinesNotification(count, total) {
+    const notification = document.getElementById('finesNotification');
+    if (notification) {
+        document.getElementById('overdueCount').textContent = count;
+        document.getElementById('totalFine').textContent = total;
+        notification.style.display = 'block';
+    }
+}
+
+function dismissFinesNotification() {
+    const notification = document.getElementById('finesNotification');
+    if (notification) {
+        notification.style.display = 'none';
+    }
+}
+
+function openFinesModal() {
+    document.getElementById('finesModal').style.display = 'flex';
+    document.body.classList.add('no-scroll');
+    loadOverdueBooks();
+    switchFinesTab('overdue');
+}
+
+function closeFinesModal() {
+    document.getElementById('finesModal').style.display = 'none';
+    document.body.classList.remove('no-scroll');
+    selectedOverdueLoans = [];
+}
+
+function switchFinesTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.fines-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('active');
+        }
+    });
+
+    // Update tab content
+    document.querySelectorAll('.fines-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    if (tabName === 'overdue') {
+        document.getElementById('overdueTab').classList.add('active');
+        loadOverdueBooks();
+    } else if (tabName === 'history') {
+        document.getElementById('historyTab').classList.add('active');
+        loadPaymentHistory();
+    }
+}
+
+function loadOverdueBooks() {
+    const container = document.getElementById('overdueBooksList');
+    container.innerHTML = '<div class="loading" style="padding:2rem;text-align:center;color:#64748b;">Loading overdue books...</div>';
+
+    fetch(`${window.APP_CTX}/student/getOverdueLoans`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.overdueLoans.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state-fines">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3>No Overdue Books</h3>
+                            <p>You don't have any overdue books at the moment.</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = data.overdueLoans.map(loan => `
+                        <div class="overdue-book-item" data-loan-id="${loan.loanId}">
+                            <input type="checkbox" class="overdue-book-checkbox" 
+                                   onchange="toggleOverdueBookSelection('${loan.loanId}', ${loan.fine})">
+                            <div class="overdue-book-info">
+                                <div class="overdue-book-title">${loan.title}</div>
+                                <div class="overdue-book-details">ISBN: ${loan.isbn}</div>
+                                <div class="overdue-book-dates">
+                                    <div class="overdue-date-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <span class="overdue-date-label">Due:</span>
+                                        <span class="overdue-date-value overdue">
+                                            ${formatDateTime(loan.expectedReturnDate)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overdue-book-fine">£${loan.fine.toFixed(2)}</div>
+                        </div>
+                    `).join('');
+                }
+                updateFinesSummary();
+            } else {
+                container.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;">Error loading overdue books</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            container.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;">Failed to load overdue books</div>';
+        });
+}
+
+function toggleOverdueBookSelection(loanId, fine) {
+    const checkbox = document.querySelector(`[data-loan-id="${loanId}"] .overdue-book-checkbox`);
+    const item = document.querySelector(`[data-loan-id="${loanId}"]`);
+
+    if (checkbox.checked) {
+        selectedOverdueLoans.push({ loanId, fine });
+        item.classList.add('selected');
+    } else {
+        selectedOverdueLoans = selectedOverdueLoans.filter(loan => loan.loanId !== loanId);
+        item.classList.remove('selected');
+    }
+
+    updateFinesSummary();
+}
+
+function updateFinesSummary() {
+    const count = selectedOverdueLoans.length;
+    const total = selectedOverdueLoans.reduce((sum, loan) => sum + loan.fine, 0);
+
+    document.getElementById('selectedCount').textContent = count;
+    document.getElementById('selectedTotal').textContent = total.toFixed(2);
+
+    const payBtn = document.getElementById('btnPayFines');
+    payBtn.disabled = count === 0;
+}
+
+function processFinePayment() {
+    if (selectedOverdueLoans.length === 0) {
+        showToast('Please select at least one book to pay fines for', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    selectedOverdueLoans.forEach(loan => {
+        formData.append('loanIds[]', loan.loanId);
+    });
+
+    fetch(`${window.APP_CTX}/student/processFinePayment`, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('✓ Payment processed successfully!', 'success');
+                selectedOverdueLoans = [];
+                checkOverdueBooks();
+                switchFinesTab('history');
+            } else {
+                showToast('✗ Payment failed: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('✗ Payment processing failed', 'error');
+        });
+}
+
+function loadPaymentHistory() {
+    const container = document.getElementById('paymentHistoryList');
+    container.innerHTML = '<div class="loading" style="padding:2rem;text-align:center;color:#64748b;">Loading payment history...</div>';
+
+    fetch(`${window.APP_CTX}/student/getPaymentHistory`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.payments.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state-fines">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <h3>No Payment History</h3>
+                            <p>You haven't made any fine payments yet.</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = data.payments.map(payment => `
+                        <div class="payment-history-item">
+                            <div class="payment-receipt-header">
+                                <div class="receipt-id">Receipt #${payment._id.$oid.substring(0, 8).toUpperCase()}</div>
+                                <span class="receipt-status ${payment.status}">${payment.status.toUpperCase()}</span>
+                            </div>
+                            <div class="receipt-details">
+                                <div class="receipt-detail-row">
+                                    <span class="receipt-detail-label">Payment Date:</span>
+                                    <span class="receipt-detail-value">${formatDateTime(payment.actualPaymentDate)}</span>
+                                </div>
+                                <div class="receipt-detail-row">
+                                    <span class="receipt-detail-label">Student Number:</span>
+                                    <span class="receipt-detail-value">${payment.studentNumber}</span>
+                                </div>
+                                <div class="receipt-detail-row">
+                                    <span class="receipt-detail-label">Full Name:</span>
+                                    <span class="receipt-detail-value">${payment.fullName}</span>
+                                </div>
+                            </div>
+                            <div class="receipt-books-list">
+                                <div class="receipt-books-title">Books Paid For:</div>
+                                ${payment.books.map(book => `
+                                    <div class="receipt-book-item">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                        </svg>
+                                        <span>${book.title} (${book.isbn})</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="receipt-total">
+                                <span class="receipt-total-label">Total Paid:</span>
+                                <span class="receipt-total-amount">£${payment.totalAmount.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                container.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;">Error loading payment history</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            container.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;">Failed to load payment history</div>';
+        });
+}
+
+function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return 'N/A';
+    const date = new Date(dateTimeStr);
+    return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Initialise fines check on student dashboard load
+if (document.querySelector('.dashboard-container')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        checkOverdueBooks();
+    });
+}
+
+
+// Load Fines Activity
+function loadFinesActivity() {
+    fetch(`${window.APP_CTX}/admin/getFinesActivity`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('finesTableBody');
+            if (data.success && data.fines.length > 0) {
+                tbody.innerHTML = data.fines.map(fine => `
+                    <tr>
+                        <td>#${fine._id.$oid.substring(0, 8).toUpperCase()}</td>
+                        <td>${fine.studentNumber}</td>
+                        <td><strong>${fine.fullName}</strong></td>
+                        <td>${fine.books.length} book(s)</td>
+                        <td><strong>£${fine.totalAmount.toFixed(2)}</strong></td>
+                        <td><span class="category-badge">${fine.status}</span></td>
+                        <td>${formatDateTime(fine.actualPaymentDate)}</td>
+                        <td>
+                            <button class="btn-edit" onclick='openAdjustFineModal(${JSON.stringify(fine)})'>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Adjust
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No fines recorded yet</td></tr>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading fines:', error);
+            document.getElementById('finesTableBody').innerHTML =
+                '<tr><td colspan="8" style="padding:1rem;color:#dc2626;">Failed to load fines</td></tr>';
+        });
+}
+
+function openAdjustFineModal(fine) {
+    document.getElementById('adjust_fineId').value = fine._id.$oid;
+    document.getElementById('adjust_currentAmount').value = `£${fine.totalAmount.toFixed(2)}`;
+    document.getElementById('adjust_newAmount').value = fine.totalAmount;
+    document.getElementById('adjustFineModal').style.display = 'flex';
+}
+
+function closeAdjustFineModal() {
+    document.getElementById('adjustFineModal').style.display = 'none';
+}
+
+document.getElementById('adjustFineForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const fineId = document.getElementById('adjust_fineId').value;
+    const newAmount = document.getElementById('adjust_newAmount').value;
+
+    fetch(`${window.APP_CTX}/admin/updateFineAmount`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `fineId=${fineId}&newAmount=${newAmount}`
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('✓ Fine amount updated successfully!', 'success');
+                closeAdjustFineModal();
+                loadFinesActivity();
+            } else {
+                showToast('✗ Failed to update fine: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('✗ Failed to update fine amount', 'error');
+        });
+});
+
+// Load fines on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.querySelector('.admin-dashboard-page')) {
+        loadFinesActivity();
+    }
+});
+

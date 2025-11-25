@@ -446,6 +446,59 @@
 </section>
 
 
+<!-- Fines Activity -->
+<section class="admin-container">
+    <div class="admin-header">
+        <h1>💰 Fines Activity</h1>
+    </div>
+
+    <div class="books-table-container">
+        <table class="books-table">
+            <thead>
+            <tr>
+                <th>Receipt ID</th>
+                <th>Student Number</th>
+                <th>Full Name</th>
+                <th>Books Count</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Payment Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="finesTableBody">
+            <tr><td colspan="8" style="padding:1rem;color:#64748b;">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Adjust Fine Modal -->
+<div id="adjustFineModal" class="modal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h2>Adjust Fine Amount</h2>
+            <button class="modal-close" onclick="closeAdjustFineModal()">&times;</button>
+        </div>
+        <form id="adjustFineForm">
+            <input type="hidden" id="adjust_fineId">
+            <div class="form-group">
+                <label class="form-label">Current Amount</label>
+                <input type="text" id="adjust_currentAmount" class="form-input" readonly>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Amount (£) <span class="required">*</span></label>
+                <input type="number" id="adjust_newAmount" class="form-input" step="0.01" min="0" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeAdjustFineModal()">Cancel</button>
+                <button type="submit" class="btn-submit">Update Amount</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 
 
@@ -608,6 +661,8 @@
             closeDeleteModal();
         }
     }
+
+
 </script>
 <script>window.APP_CTX='${pageContext.request.contextPath}';</script>
 <script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>

@@ -46,6 +46,24 @@
     </div>
 </nav>
 
+<!-- Fines Notification -->
+<div id="finesNotification" class="fines-notification" style="display: none;">
+    <div class="fines-notification-content">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div class="fines-notification-text">
+            <strong>Overdue Books Alert!</strong>
+            <span>You have <span id="overdueCount">0</span> overdue book(s). Total fine: £<span id="totalFine">0</span></span>
+        </div>
+        <button class="btn-pay-fines" onclick="openFinesModal()">Pay Fines</button>
+        <button class="fines-notification-close" onclick="dismissFinesNotification()">&times;</button>
+    </div>
+</div>
+
+
 <!-- Dashboard Content -->
 <div class="dashboard-container">
     <div class="success-card">
@@ -96,6 +114,11 @@
                 <h3>My Profile</h3>
                 <p>Manage your account</p>
             </a>
+            <a href="#" class="action-card" onclick="openFinesModal()">
+                <div class="action-icon">💳</div>
+                <h3>Pay Fines</h3>
+                <p>Manage your fines</p>
+            </a>
         </div>
     </div>
 </div>
@@ -117,6 +140,70 @@
         </div>
     </div>
 </div>
+
+
+<!-- Fines Payment Modal -->
+<div id="finesModal" class="modal">
+    <div class="modal-content fines-modal-content">
+        <div class="modal-header">
+            <h2>💳 Pay Fines</h2>
+            <button class="modal-close" onclick="closeFinesModal()">&times;</button>
+        </div>
+
+        <div class="fines-modal-body">
+            <!-- Tabs -->
+            <div class="fines-tabs">
+                <button class="fines-tab active" data-tab="overdue" onclick="switchFinesTab('overdue')">
+                    Overdue Books
+                </button>
+                <button class="fines-tab" data-tab="history" onclick="switchFinesTab('history')">
+                    Payment History
+                </button>
+            </div>
+
+            <!-- Overdue Books Tab -->
+            <div id="overdueTab" class="fines-tab-content active">
+                <div class="fines-info-banner">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                    <span>Fine rate: <strong>£10 per overdue book</strong></span>
+                </div>
+
+                <div id="overdueBooksList" class="overdue-books-list">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <div class="fines-summary">
+                    <div class="fines-summary-row">
+                        <span>Selected Books:</span>
+                        <strong id="selectedCount">0</strong>
+                    </div>
+                    <div class="fines-summary-row fines-total">
+                        <span>Total Fine:</span>
+                        <strong>£<span id="selectedTotal">0</span></strong>
+                    </div>
+                </div>
+
+                <div class="fines-actions">
+                    <button class="btn-cancel" onclick="closeFinesModal()">Cancel</button>
+                    <button class="btn-submit" id="btnPayFines" onclick="processFinePayment()" disabled>
+                        Pay Selected Fines
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment History Tab -->
+            <div id="historyTab" class="fines-tab-content">
+                <div id="paymentHistoryList" class="payment-history-list">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 

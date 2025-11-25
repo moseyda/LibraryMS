@@ -586,6 +586,7 @@ body {
 .footer-links {
     display: flex;
     gap: 2rem;
+    align-items: center;
 }
 
 .footer-links a {
@@ -1300,6 +1301,615 @@ body.login-page {
         align-items: flex-start;
     }
 }
+/* ==========================================
+   FINES NOTIFICATION & MODAL
+   ======================================== */
+
+/* Sticky Fines Notification */
+.fines-notification {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 900px;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #dc2626;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.2);
+    z-index: 1000;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.fines-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.fines-notification svg {
+    flex-shrink: 0;
+    color: #dc2626;
+    width: 24px;
+    height: 24px;
+}
+
+.fines-notification-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.fines-notification-text strong {
+    color: #991b1b;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.fines-notification-text span {
+    color: #7f1d1d;
+    font-size: 0.9rem;
+}
+
+.btn-pay-fines {
+    padding: 0.75rem 1.5rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-pay-fines:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+}
+
+.fines-notification-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #991b1b;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.fines-notification-close:hover {
+    background: rgba(185, 28, 28, 0.1);
+}
+
+/* Fines Modal */
+.fines-modal-content {
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    background: white;
+}
+
+.fines-modal-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+}
+
+.fines-info-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    margin: 0 1.5rem 1.5rem;
+    color: #1e40af;
+    font-size: 0.875rem;
+}
+
+.fines-info-banner svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+}
+
+/* Tabs */
+.fines-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin: 0 1.5rem 1.5rem;
+}
+
+.fines-tab {
+    padding: 0.875rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #9ca3af;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    position: relative;
+    bottom: -1px;
+}
+
+.fines-tab:hover {
+    color: #4b5563;
+}
+
+.fines-tab.active {
+    color: #4f46e5;
+    border-bottom-color: #4f46e5;
+}
+
+.fines-tab-content {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+.fines-tab-content.active {
+    display: flex;
+}
+
+/* Overdue Books List */
+.overdue-books-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.overdue-book-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.overdue-book-item:hover {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.overdue-book-item.selected {
+    border-color: #6366f1;
+    background: #eef2ff;
+}
+
+.overdue-book-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #6366f1;
+}
+
+.overdue-book-info {
+    flex: 1;
+}
+
+.overdue-book-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.overdue-book-details {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.overdue-book-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.overdue-date-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.overdue-date-item svg {
+    width: 14px;
+    height: 14px;
+    color: #94a3b8;
+}
+
+.overdue-date-label {
+    color: #64748b;
+    min-width: 85px;
+}
+
+.overdue-date-value {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.overdue-date-value.overdue {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.overdue-book-fine {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #dc2626;
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-radius: 10px;
+    border: 2px solid #fecaca;
+}
+
+/* Fines Summary */
+.fines-summary {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    margin: 0;
+}
+
+.fines-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.fines-summary-row.fines-total {
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 0.5rem;
+}
+
+.fines-summary-row span {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.fines-summary-row strong {
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+.fines-summary-row.fines-total strong {
+    color: #dc2626;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Actions */
+.fines-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.btn-submit {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+}
+
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Payment History */
+.payment-history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1.5rem;
+}
+
+.payment-history-item {
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.payment-history-item:hover {
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.payment-receipt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.receipt-id {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1rem;
+}
+
+.receipt-status {
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.receipt-status.completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.receipt-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+}
+
+.receipt-detail-label {
+    color: #64748b;
+}
+
+.receipt-detail-value {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.receipt-books-list {
+    margin: 1.25rem 0;
+    padding: 1.25rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.receipt-books-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.receipt-book-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.receipt-book-item svg {
+    width: 16px;
+    height: 16px;
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+.receipt-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.25rem;
+    border-top: 2px solid #e5e7eb;
+}
+
+.receipt-total-label {
+    font-weight: 700;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.receipt-total-amount {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #dc2626;
+}
+
+/* Empty States */
+.empty-state-fines {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state-fines svg {
+    width: 80px;
+    height: 80px;
+    color: #cbd5e1;
+    margin: 0 auto 1.5rem;
+}
+
+.empty-state-fines h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state-fines p {
+    color: #64748b;
+    font-size: 0.95rem;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Scrollbar Styling */
+.overdue-books-list::-webkit-scrollbar,
+.payment-history-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.overdue-books-list::-webkit-scrollbar-track,
+.payment-history-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.overdue-books-list::-webkit-scrollbar-thumb,
+.payment-history-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.overdue-books-list::-webkit-scrollbar-thumb:hover,
+.payment-history-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fines-notification {
+        width: 95%;
+        top: 70px;
+    }
+
+    .fines-notification-content {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .btn-pay-fines {
+        width: 100%;
+    }
+
+    .fines-modal-content {
+        max-width: 700px;
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .fines-tabs {
+        gap: 0.25rem;
+    }
+
+    .fines-tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .overdue-book-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .overdue-book-checkbox {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+    }
+
+    .overdue-book-fine {
+        width: 100%;
+        text-align: center;
+    }
+
+    .fines-actions {
+        flex-direction: column;
+    }
+
+    .fines-summary {
+        padding: 1rem;
+    }
+
+    .receipt-detail-row {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .receipt-total {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
+
+
 
 /* ========================================
    ADMIN LOGIN PAGE STYLES
