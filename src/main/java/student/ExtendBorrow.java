@@ -48,7 +48,7 @@ public class ExtendBorrow extends HttpServlet {
             LocalDate newExpectedReturnDate = Instant.ofEpochMilli(currentExpectedReturnDate.getTime())
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate()
-                    .plusDays(10);
+                    .plusDays(1); //add extending days amount, for test purposes keep it at 1 for 24 hours frame
 
             histCol.updateOne(
                     new Document("_id", new ObjectId(borrowId)),

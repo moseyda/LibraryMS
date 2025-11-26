@@ -70,7 +70,7 @@ public class BorrowBook extends HttpServlet {
             }
 
             LocalDate borrowDate = LocalDate.now();
-            LocalDate expectedReturnDate = borrowDate.plusDays(10);
+            LocalDate expectedReturnDate = borrowDate.plusDays(1); // change it to 5, 10 or any other duration, for test purposes, keep at 1 for 24 hour timeframe.
 
             Document borrowRecord = new Document()
                     .append("isbn", isbn)
