@@ -3,4 +3,31 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
+
+    <servlet>
+        <servlet-name>FinesServlet</servlet-name>
+        <servlet-class>common.FinesServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>FinesServlet</servlet-name>
+        <url-pattern>/student/getOverdueLoans</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FinesServlet</servlet-name>
+        <url-pattern>/student/processFinePayment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FinesServlet</servlet-name>
+        <url-pattern>/student/getPaymentHistory</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FinesServlet</servlet-name>
+        <url-pattern>/admin/getFinesActivity</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FinesServlet</servlet-name>
+        <url-pattern>/admin/updateFineAmount</url-pattern>
+    </servlet-mapping>
+
 </web-app>
