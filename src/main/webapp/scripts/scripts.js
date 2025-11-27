@@ -282,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       <option value="">All Statuses</option>
                       <option value="borrowed">Borrowed</option>
                       <option value="returned">Returned</option>
+                      <option value="overdue">Overdue</option>
                   </select>
                   <select id="historySortField"
                           style="padding:0.5rem 0.75rem;border:2px solid #e5e7eb;border-radius:8px;">
@@ -353,12 +354,30 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderHistoryRows(records) {
         const body = document.getElementById('historyTableBody');
         if (!body) return;
+
         if (records.length === 0) {
             body.innerHTML = '<tr><td colspan="6" style="padding:1rem;color:#64748b;">No history found</td></tr>';
             return;
         }
+
         body.innerHTML = records.map(record => {
+            const rawStatus = (record.status || '').toLowerCase();
+            const uiStatus = ['borrowed', 'returned', 'overdue'].includes(rawStatus)
+                ? rawStatus
+                : 'borrowed';
+
+            const label =
+                uiStatus === 'overdue' ? 'Overdue' :
+                    uiStatus === 'returned' ? 'Returned' :
+                        'Borrowed';
+
+            const cssClass =
+                uiStatus === 'overdue' ? 'overdue' :
+                    uiStatus === 'returned' ? 'returned' :
+                        'borrowed';
+
             const actualReturnRaw = record.actualReturnDate?.$date || record.actualReturnDate;
+
             return `
             <tr style="border-bottom:1px solid #f1f5f9;">
               <td style="padding:1rem;">${escapeHtml(record.title || 'Unknown')}</td>
@@ -367,13 +386,14 @@ document.addEventListener('DOMContentLoaded', function () {
               <td style="padding:1rem;">${formatDateTime(record.expectedReturnDate?.$date || record.expectedReturnDate)}</td>
               <td style="padding:1rem;">${actualReturnRaw ? formatDateTime(actualReturnRaw) : 'Not returned'}</td>
               <td style="padding:1rem;">
-                <span class="book-status ${record.status === 'borrowed' ? 'borrowed' : 'available'}">
-                  ${record.status === 'borrowed' ? 'Borrowed' : 'Returned'}
+                <span class="book-status ${cssClass}">
+                  ${label}
                 </span>
               </td>
             </tr>`;
         }).join('');
     }
+
 
     function formatDateTime(date) {
         if (!date) return 'N/A';
@@ -411,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderLoans(records) {
         const body = document.getElementById('loansTableBody');
         if (!body) return;
+
         if (!records || records.length === 0) {
             body.innerHTML = `<tr><td colspan="7" style="padding:1rem;color:#64748b;">No loan records</td></tr>`;
             return;
@@ -423,13 +444,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const borrowed = formatDateTime(r.borrowDate?.$date || r.borrowDate);
             const expected = formatDateTime(r.expectedReturnDate?.$date || r.expectedReturnDate);
             const returned = r.actualReturnDate ? formatDateTime(r.actualReturnDate?.$date || r.actualReturnDate) : null;
-            const isBorrowed = String(r.status || '').toLowerCase() === 'borrowed';
 
-            const statusBadge = isBorrowed
-                ? `<span class="book-status borrowed">Borrowed</span>`
-                : `<span class="book-status available">Returned</span>`;
+            const rawStatus = (r.status || '').toLowerCase();
+            const uiStatus = ['borrowed', 'returned', 'overdue'].includes(rawStatus)
+                ? rawStatus
+                : 'borrowed';
 
-            const actions = isBorrowed
+            const isBorrowedLike = uiStatus === 'borrowed' || uiStatus === 'overdue';
+
+            const cssClass =
+                uiStatus === 'overdue' ? 'overdue' :
+                    uiStatus === 'returned' ? 'returned' :
+                        'borrowed';
+
+            const label =
+                uiStatus === 'overdue' ? 'Overdue' :
+                    uiStatus === 'returned' ? 'Returned' :
+                        'Borrowed';
+
+            const statusBadge =
+                `<span class="book-status ${cssClass}">${label}</span>` +
+                (returned
+                    ? `<div style="font-size:0.75rem;color:#6b7280;margin-top:0.25rem;">Returned: ${returned}</div>`
+                    : '');
+
+            const actions = isBorrowedLike
                 ? `<button class="btn-delete" onclick="adminReturnBook('${id}')">Mark Returned</button>`
                 : `<span style="color:#9ca3af;">—</span>`;
 
@@ -440,10 +479,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <td style="padding:1rem;">${escapeHtml(borrower)}${sNum}</td>
           <td style="padding:1rem;">${borrowed}</td>
           <td style="padding:1rem;">${expected}</td>
-          <td style="padding:1rem;">${statusBadge}${!isBorrowed && returned ? `<br><small>${returned}</small>` : ''}</td>
+          <td style="padding:1rem;">${statusBadge}</td>
           <td style="padding:1rem;">${actions}</td>
-        </tr>
-      `;
+        </tr>`;
         }).join('');
     }
 

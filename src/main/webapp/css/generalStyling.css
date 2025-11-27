@@ -3088,6 +3088,13 @@ body.admin-dashboard-page {
 #booksModal .borrow-btn:disabled { background-color: #d1d5db; cursor: not-allowed; }
 
 
+.book-status.overdue {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border-color: rgba(185, 28, 28, 0.25);
+    box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.25);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-header {

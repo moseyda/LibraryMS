@@ -16,6 +16,7 @@ import org.bson.json.JsonWriterSettings;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "student.AccountHistory", value = "/accountHistory")
 public class AccountHistory extends HttpServlet {
@@ -23,7 +24,7 @@ public class AccountHistory extends HttpServlet {
     private static final String MONGO_URI = "mongodb://localhost:27017";
     private static final String DB_NAME = "dbLibraryMS";
     private static final Set<String> ALLOWED_FIELDS =
-            new HashSet<>(Arrays.asList("borrowDate","expectedReturnDate","actualReturnDate","title","status"));
+            new HashSet<>(Arrays.asList("borrowDate", "expectedReturnDate", "actualReturnDate", "title", "status"));
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -54,17 +55,48 @@ public class AccountHistory extends HttpServlet {
                     .sort(new Document(sortField, sortDir))
                     .into(history);
 
+            // Compute status including overdue
+            Date now = new Date();
+            List<Document> enriched = history.stream()
+                    .map(doc -> {
+                        Document copy = new Document(doc);
+                        String computed = computeStatus(copy, now);
+                        copy.put("status", computed);
+                        return copy;
+                    })
+                    .collect(Collectors.toList());
+
             JsonWriterSettings settings = JsonWriterSettings.builder().build();
-            String json = history.stream()
+            String json = enriched.stream()
                     .map(doc -> doc.toJson(settings))
-                    .collect(java.util.stream.Collectors.joining(",", "[", "]"));
+                    .collect(Collectors.joining(",", "[", "]"));
 
             response.setStatus(HttpServletResponse.SC_OK);
             out.write(json);
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            String msg = e.getMessage() == null ? "Server error" : e.getMessage().replace("\"","'");
+            String msg = e.getMessage() == null ? "Server error" : e.getMessage().replace("\"", "'");
             response.getWriter().write("{\"error\":\"" + msg + "\"}");
         }
+    }
+
+    private String computeStatus(Document doc, Date now) {
+        Date expected = doc.getDate("expectedReturnDate");
+        Date actual = doc.getDate("actualReturnDate");
+        String dbStatus = doc.getString("status");
+
+        if (actual != null) {
+            return "returned";
+        }
+        if (expected != null && expected.before(now)) {
+            return "overdue";
+        }
+        if (dbStatus != null) {
+            String s = dbStatus.toLowerCase();
+            if (s.equals("borrowed") || s.equals("returned") || s.equals("overdue")) {
+                return s;
+            }
+        }
+        return "borrowed";
     }
 }

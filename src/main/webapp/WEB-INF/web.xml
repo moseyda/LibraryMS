@@ -4,6 +4,7 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
+    <!-- Fines Management -->
     <servlet>
         <servlet-name>FinesServlet</servlet-name>
         <servlet-class>common.FinesServlet</servlet-class>
@@ -28,6 +29,21 @@
     <servlet-mapping>
         <servlet-name>FinesServlet</servlet-name>
         <url-pattern>/admin/updateFineAmount</url-pattern>
+    </servlet-mapping>
+
+    <!-- Student Profile Management -->
+    <servlet>
+        <servlet-name>Profile</servlet-name>
+        <servlet-class>student.Profile</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Profile</servlet-name>
+        <url-pattern>/student/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Profile</servlet-name>
+        <url-pattern>/student/updatePassword</url-pattern>
     </servlet-mapping>
 
 </web-app>
