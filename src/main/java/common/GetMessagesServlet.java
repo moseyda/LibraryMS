@@ -14,8 +14,8 @@ public class GetMessagesServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
-            MongoDatabase db = mongo.getDatabase("dbLibraryMS");
+        try (MongoClient mongo = MongoClientProvider.createClient()) {
+            MongoDatabase db = mongo.getDatabase(MongoClientProvider.getDatabaseName());
             MongoCollection<Document> messages = db.getCollection("Messages");
 
             List<Document> docs = messages.find().sort(new Document("timestamp", -1)).into(new ArrayList<>());
