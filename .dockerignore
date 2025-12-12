@@ -1,8 +1,0 @@
-target/
-*.log
-*.iml
-.idea/
-.git/
-.gitignore
-screenshots/
-*.md

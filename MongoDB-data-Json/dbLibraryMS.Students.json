@@ -1,0 +1,54 @@
+[{
+  "_id": {
+    "$oid": "690feba6b735c9888534c59b"
+  },
+  "FName": "John",
+  "LName": "John",
+  "SNumber": "2025001",
+  "Password": "Johnny"
+},
+{
+  "_id": {
+    "$oid": "6910b9394aa03897e85c7ba5"
+  },
+  "FName": "John",
+  "LName": "Doe",
+  "SNumber": "1234567",
+  "Password": "Johnny"
+},
+{
+  "_id": {
+    "$oid": "691678dea1ff80add6de8222"
+  },
+  "FName": "Ali",
+  "LName": "Manchester",
+  "SNumber": "7654321",
+  "Password": "AliMan"
+},
+{
+  "_id": {
+    "$oid": "69167a88a1ff80add6de8224"
+  },
+  "FName": "Jordan",
+  "LName": "Jordanian",
+  "SNumber": "1357910",
+  "Password": "Jordanian"
+},
+{
+  "_id": {
+    "$oid": "69167af7a1ff80add6de8226"
+  },
+  "FName": "Manu",
+  "LName": "Manuian",
+  "SNumber": "0987654",
+  "Password": "ManuMan"
+},
+{
+  "_id": {
+    "$oid": "69167b6822067fbeb30e3905"
+  },
+  "FName": "Eddie",
+  "LName": "Edward",
+  "SNumber": "1324354",
+  "Password": "Edwards"
+}]

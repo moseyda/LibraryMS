@@ -15,9 +15,11 @@
           <element id="library" level="project" name="Maven: org.mongodb:bson-record-codec:5.6.1" />
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.9" />
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-simple:2.0.9" />
+          <element id="library" level="project" name="Maven: org.json:json:20250517" />
         </element>
       </element>
       <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp" />
+      <element id="javaee-facet-resources" facet="LibraryMS/web/Web" />
     </root>
   </artifact>
 </component>

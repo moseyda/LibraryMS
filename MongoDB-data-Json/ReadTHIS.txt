@@ -1,0 +1,23 @@
+The json files in this directory contain sample data exported from a MongoDB database.
+Each file corresponds to a specific collection within the database and is formatted in JSON for easy readability and manipulation.
+
+To use these files, you can import them into your own MongoDB instance using the MongoDB Compass GUI.
+
+To import a JSON file using MongoDB Compass, follow these steps:
+
+1. Open MongoDB Compass and connect
+2. Hover over localhost:27017 and click "+"
+3. Name the database strictly as following (dbLibraryMS) and collection names as per the file names (e.g., "Books", "BorrowReturnHist", etc.)
+4. After creating the database and collection, click on the collection name to open it.
+5. Click on the "ADD DATA" button.
+6. Select "Import File" from the dropdown menu.
+7. In the import dialog, click "SELECT FILE" and choose the corresponding JSON file from this directory.
+8. Ensure the "File Type" is set to "JSON".
+9. Click the "IMPORT" button to start the import process.
+10. Repeat the above steps for each JSON file in this directory to populate all collections in the database.
+
+Once all files are imported, you will have a fully populated MongoDB database ready for use.
+
+** Note: It's mandatory for this project to create the database with the name "dbLibraryMS" and one collection;
+** At least the "Admin" collection should be created as the credentials for the admin is predefined in the application code.
+--> Failure to do so may result in authentication issues when accessing the admin interface.

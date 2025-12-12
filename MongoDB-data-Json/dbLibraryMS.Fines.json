@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "693b7ec678c90e21b0dd9e9a"
+  },
+  "studentNumber": "1234567",
+  "fullName": "John Doe",
+  "books": [
+    {
+      "title": "Demo",
+      "isbn": "22-121-12122"
+    }
+  ],
+  "totalAmount": 10,
+  "status": "paid",
+  "expectedPaymentDate": "2025-12-05T02:32:38.677660700",
+  "actualPaymentDate": "2025-12-12T02:32:38.677660700",
+  "createdAt": "2025-12-12T02:32:38.677660700"
+}]

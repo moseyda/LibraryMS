@@ -257,4 +257,186 @@
     "$date": "2025-11-10T02:16:00.476Z"
   },
   "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6916944934fc82d24b3d84d2"
+  },
+  "isbn": "33-131-13133",
+  "title": "Demo2",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-14T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-24T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-14T02:38:26.110Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "691695a571736688dd825f27"
+  },
+  "title": "Demo",
+  "isbn": "22-121-12122",
+  "firstName": "John",
+  "lastName": "Doe",
+  "SNumber": "1234567",
+  "borrowDate": {
+    "$date": "2025-11-07T10:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-10T10:00:00.000Z"
+  },
+  "status": "returned",
+  "actualReturnDate": {
+    "$date": "2025-11-14T02:37:31.150Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "691e7c11019b59db510c341d"
+  },
+  "isbn": "978-0-618-9472-7",
+  "title": "The Quantum Tapestry",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-20T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-30T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-20T02:25:45.925Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "691e7c49019b59db510c3429"
+  },
+  "isbn": "978-1-4098-8754-2",
+  "title": "Echoes of the Digital Mind",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-20T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-30T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-20T02:26:36.305Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "691fa6b715df08ad016e800b"
+  },
+  "isbn": "978-1-6093-2219-8",
+  "title": "The Algorithmic Oracle",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-20T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-30T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-12-10T02:11:16.976Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "692669bf5863cc61d956ab54"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-26T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-27T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-11-26T02:57:41.192Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69266c5b5863cc61d956ab85"
+  },
+  "isbn": "978-0-618-9472-7",
+  "title": "The Quantum Tapestry",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-11-26T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-11-27T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-12-10T02:11:20.518Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "693b7c1b78c90e21b0dd9e74"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-12-10T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-12-11T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-12-12T02:35:21.359Z"
+  },
+  "status": "returned",
+  "finePaid": true,
+  "finePaidDate": "2025-12-12T02:32:38.677660700"
+},
+{
+  "_id": {
+    "$oid": "693b7e5578c90e21b0dd9e8a"
+  },
+  "isbn": "978-1-4379-6042-9",
+  "title": "Winds of the Silver Sea",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2025-12-12T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2025-12-13T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2025-12-12T02:30:58.294Z"
+  },
+  "status": "returned"
 }]
