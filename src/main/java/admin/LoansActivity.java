@@ -4,14 +4,22 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import configs.DatabaseConfig;
+import configs.SQLClientProvider;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.bson.Document;
 import org.bson.json.JsonWriterSettings;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,37 +36,15 @@ public class LoansActivity extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        String statusFilter = request.getParameter("status"); // optional: borrowed / returned / overdue
+        String statusFilter = request.getParameter("status");
 
-        try (MongoClient client = MongoClients.create(MONGO_URI);
-             PrintWriter out = response.getWriter()) {
-
-            MongoDatabase db = client.getDatabase(DB_NAME);
-            MongoCollection<Document> col = db.getCollection("BorrowReturnHist");
-
-            // Base filter: we do NOT filter by status here to allow computed overdue
-            List<Document> records = new ArrayList<>();
-            col.find(new Document())
-                    .sort(new Document("borrowDate", -1))
-                    .into(records);
-
-            // Enrich with computed status
-            Date now = new Date();
-            List<Document> enriched = records.stream()
-                    .map(doc -> {
-                        Document copy = new Document(doc); // avoid mutating original
-                        String computed = computeStatus(copy, now);
-                        copy.put("status", computed); // override status field for frontend
-                        return copy;
-                    })
-                    .filter(d -> statusFilter == null || statusFilter.isBlank()
-                            || statusFilter.equalsIgnoreCase(d.getString("status")))
-                    .collect(Collectors.toList());
-
-            JsonWriterSettings settings = JsonWriterSettings.builder().build();
-            String json = enriched.stream()
-                    .map(d -> d.toJson(settings))
-                    .collect(Collectors.joining(",", "[", "]"));
+        try (PrintWriter out = response.getWriter()) {
+            String json;
+            if (DatabaseConfig.isMongoDB()) {
+                json = getLoansActivityMongoDB(statusFilter);
+            } else {
+                json = getLoansActivitySQL(statusFilter);
+            }
 
             response.setStatus(HttpServletResponse.SC_OK);
             out.write(json);
@@ -72,22 +58,96 @@ public class LoansActivity extends HttpServlet {
         }
     }
 
-    private String computeStatus(Document doc, Date now) {
+    // MongoDB implementation
+    private String getLoansActivityMongoDB(String statusFilter) {
+        try (MongoClient client = MongoClients.create(MONGO_URI)) {
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> col = db.getCollection("BorrowReturnHist");
+
+            List<Document> records = new ArrayList<>();
+            col.find(new Document())
+                    .sort(new Document("borrowDate", -1))
+                    .into(records);
+
+            Date now = new Date();
+            List<Document> enriched = records.stream()
+                    .map(doc -> {
+                        Document copy = new Document(doc);
+                        String computed = computeStatusMongo(copy, now);
+                        copy.put("status", computed);
+                        return copy;
+                    })
+                    .filter(d -> statusFilter == null || statusFilter.isBlank()
+                            || statusFilter.equalsIgnoreCase(d.getString("status")))
+                    .collect(Collectors.toList());
+
+            JsonWriterSettings settings = JsonWriterSettings.builder().build();
+            return enriched.stream()
+                    .map(d -> d.toJson(settings))
+                    .collect(Collectors.joining(",", "[", "]"));
+        }
+    }
+
+    // SQL implementation
+    private String getLoansActivitySQL(String statusFilter) throws Exception {
+        String sql = "SELECT * FROM BorrowReturnHist ORDER BY borrowDate DESC";
+
+        try (Connection conn = SQLClientProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            JSONArray jsonArray = new JSONArray();
+            Date now = new Date();
+
+            while (rs.next()) {
+                Timestamp expectedReturn = rs.getTimestamp("expectedReturnDate");
+                Timestamp actualReturn = rs.getTimestamp("actualReturnDate");
+                String dbStatus = rs.getString("status");
+
+                String computedStatus = computeStatusSQL(expectedReturn, actualReturn, dbStatus, now);
+
+                if (statusFilter != null && !statusFilter.isBlank()
+                        && !statusFilter.equalsIgnoreCase(computedStatus)) {
+                    continue;
+                }
+
+                JSONObject obj = new JSONObject();
+                obj.put("record_id", rs.getInt("record_id"));
+                obj.put("SNumber", rs.getString("SNumber"));
+                obj.put("book_id", rs.getInt("book_id"));
+                obj.put("borrowDate", rs.getTimestamp("borrowDate") != null ? rs.getTimestamp("borrowDate").getTime() : null);
+                obj.put("dueDate", rs.getTimestamp("dueDate") != null ? rs.getTimestamp("dueDate").getTime() : null);
+                obj.put("expectedReturnDate", expectedReturn != null ? expectedReturn.getTime() : null);
+                obj.put("actualReturnDate", actualReturn != null ? actualReturn.getTime() : null);
+                obj.put("returnDate", rs.getTimestamp("returnDate") != null ? rs.getTimestamp("returnDate").getTime() : null);
+                obj.put("status", computedStatus);
+                jsonArray.put(obj);
+            }
+
+            return jsonArray.toString();
+        }
+    }
+
+    private String computeStatusMongo(Document doc, Date now) {
         Date expected = doc.getDate("expectedReturnDate");
         Date actual = doc.getDate("actualReturnDate");
-        String dbStatus = doc.getString("status"); // original
+        String dbStatus = doc.getString("status");
 
-        if (actual != null) {
-            return "returned";
-        }
-        if (expected != null && expected.before(now)) {
-            return "overdue";
-        }
+        if (actual != null) return "returned";
+        if (expected != null && expected.before(now)) return "overdue";
         if (dbStatus != null) {
             String s = dbStatus.toLowerCase();
-            if (s.equals("borrowed") || s.equals("returned") || s.equals("overdue")) {
-                return s;
-            }
+            if (s.equals("borrowed") || s.equals("returned") || s.equals("overdue")) return s;
+        }
+        return "borrowed";
+    }
+
+    private String computeStatusSQL(Timestamp expected, Timestamp actual, String dbStatus, Date now) {
+        if (actual != null) return "returned";
+        if (expected != null && expected.before(now)) return "overdue";
+        if (dbStatus != null) {
+            String s = dbStatus.toLowerCase();
+            if (s.equals("borrowed") || s.equals("returned") || s.equals("overdue")) return s;
         }
         return "borrowed";
     }
