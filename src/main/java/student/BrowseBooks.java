@@ -4,15 +4,20 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import configs.DatabaseConfig;
+import configs.SQLClientProvider;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.bson.Document;
 import org.bson.json.JsonWriterSettings;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,9 +33,25 @@ public class BrowseBooks extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        try (MongoClient client = MongoClients.create(MONGO_URI);
-             PrintWriter out = response.getWriter()) {
 
+        try (PrintWriter out = response.getWriter()) {
+            String json;
+            if (DatabaseConfig.isMongoDB()) {
+                json = browseBooksMongoDB();
+            } else {
+                json = browseBooksSQL();
+            }
+            response.setStatus(HttpServletResponse.SC_OK);
+            out.write(json);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            String msg = e.getMessage() == null ? "Server error" : e.getMessage().replace("\"", "'");
+            response.getWriter().write("{\"error\":\"" + msg + "\"}");
+        }
+    }
+
+    private String browseBooksMongoDB() {
+        try (MongoClient client = MongoClients.create(MONGO_URI)) {
             MongoDatabase db = client.getDatabase(DB_NAME);
             MongoCollection<Document> col = db.getCollection(COLLECTION_NAME);
 
@@ -67,18 +88,42 @@ public class BrowseBooks extends HttpServlet {
             }
 
             JsonWriterSettings settings = JsonWriterSettings.builder().build();
-            String json = mapped.stream()
+            return mapped.stream()
                     .map(doc -> doc.toJson(settings))
                     .collect(Collectors.joining(",", "[", "]"));
+        }
+    }
 
-            response.setStatus(HttpServletResponse.SC_OK);
-            out.write(json);
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            try (PrintWriter err = response.getWriter()) {
-                String msg = e.getMessage() == null ? "Server error" : e.getMessage().replace("\"", "'");
-                err.write("{\"error\":\"" + msg + "\"}");
+    private String browseBooksSQL() throws SQLException {
+        String sql = "SELECT book_id, title, author, isbn, category, publisher, " +
+                "publicationYear, quantity, available, description FROM Books";
+
+        try (Connection conn = SQLClientProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            JSONArray books = new JSONArray();
+
+            while (rs.next()) {
+                JSONObject book = new JSONObject();
+                book.put("book_id", rs.getInt("book_id"));
+                book.put("title", rs.getString("title"));
+                book.put("author", rs.getString("author"));
+                book.put("isbn", rs.getString("isbn"));
+                book.put("category", rs.getString("category"));
+                book.put("publisher", rs.getString("publisher"));
+                book.put("publicationYear", rs.getObject("publicationYear"));
+                book.put("quantity", rs.getInt("quantity"));
+
+                int available = rs.getInt("available");
+                book.put("available", available);
+                book.put("description", rs.getString("description"));
+                book.put("status", available > 0 ? "Available" : "Unavailable");
+
+                books.put(book);
             }
+
+            return books.toString();
         }
     }
 

@@ -68,9 +68,10 @@ CREATE TABLE IF NOT EXISTS FineBooks (
 
 CREATE TABLE IF NOT EXISTS Messages (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
-    studentNumber VARCHAR(50),
-    name VARCHAR(100),
+    studentNumber VARCHAR(50) NOT NULL,
+    name VARCHAR(200),
     subject VARCHAR(255),
     message TEXT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (studentNumber) REFERENCES Students(SNumber)
     );
