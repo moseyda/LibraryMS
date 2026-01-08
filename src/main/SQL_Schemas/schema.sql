@@ -27,26 +27,43 @@ CREATE TABLE IF NOT EXISTS BorrowReturnHist (
     record_id INT AUTO_INCREMENT PRIMARY KEY,
     SNumber VARCHAR(50) NOT NULL,
     book_id INT NOT NULL,
+    firstName VARCHAR(100),
+    lastName VARCHAR(100),
     borrowDate TIMESTAMP,
-    dueDate TIMESTAMP,
     expectedReturnDate TIMESTAMP,
     actualReturnDate TIMESTAMP,
-    returnDate TIMESTAMP,
-    status VARCHAR(20),
+    status VARCHAR(20) DEFAULT 'borrowed',
+    finePaid BOOLEAN DEFAULT FALSE,
+    finePaidDate TIMESTAMP,
     FOREIGN KEY (SNumber) REFERENCES Students(SNumber),
     FOREIGN KEY (book_id) REFERENCES Books(book_id)
     );
 
-
-
 CREATE TABLE IF NOT EXISTS Fines (
     fine_id INT AUTO_INCREMENT PRIMARY KEY,
-    studentNumber VARCHAR(50) NOT NULL,
-    record_id INT,
-    amount DECIMAL(10,2),
-    paid BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (record_id) REFERENCES BorrowReturnHist(record_id)
-);
+    SNumber VARCHAR(50) NOT NULL,
+    fullName VARCHAR(200),
+    totalAmount DECIMAL(10,2),
+    status VARCHAR(20),
+    expectedPaymentDate TIMESTAMP,
+    actualPaymentDate TIMESTAMP,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    adjustedByAdmin BOOLEAN DEFAULT FALSE,
+    adjustmentDate TIMESTAMP,
+    FOREIGN KEY (SNumber) REFERENCES Students(SNumber)
+    );
+
+-- FineBooks table to store books array associated with each fine. --
+-- unlike Mongodb, we need a separate table for this in SQL as arrays cannot be stored directly --
+
+CREATE TABLE IF NOT EXISTS FineBooks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fine_id INT NOT NULL,
+    title VARCHAR(255),
+    isbn VARCHAR(50),
+    FOREIGN KEY (fine_id) REFERENCES Fines(fine_id) ON DELETE CASCADE
+    );
+
 
 
 CREATE TABLE IF NOT EXISTS Messages (
