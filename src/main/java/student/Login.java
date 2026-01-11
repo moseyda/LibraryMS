@@ -1,9 +1,16 @@
 package student;
 
 import com.mongodb.client.*;
+import configs.DatabaseConfig;
+import configs.SQLClientProvider;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,7 +26,6 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Forward to login page
         request.getRequestDispatcher("/student/login.jsp").forward(request, response);
     }
 
@@ -30,32 +36,32 @@ public class Login extends HttpServlet {
         String snumber = request.getParameter("snumber");
         String password = request.getParameter("password");
 
-        // Authenticate user
-        Document user = authenticateUser(snumber, password);
+        String[] userData;
+        if (DatabaseConfig.isMongoDB()) {
+            userData = authenticateUserMongoDB(snumber, password);
+        } else {
+            userData = authenticateUserSQL(snumber, password);
+        }
 
-        if (user != null) {
-            // Login successful - create session
+        if (userData != null) {
             HttpSession session = request.getSession();
             session.setAttribute("loggedIn", true);
-            session.setAttribute("userFName", user.getString("FName"));
-            session.setAttribute("userLName", user.getString("LName"));
-            session.setAttribute("userSNumber", user.getString("SNumber"));
+            session.setAttribute("userFName", userData[0]);
+            session.setAttribute("userLName", userData[1]);
+            session.setAttribute("userSNumber", userData[2]);
 
-            // Redirect to success page
             response.sendRedirect(request.getContextPath() + "/student/studentDashboard.jsp");
         } else {
-            // Login failed - send back to login with error
             request.setAttribute("errorMessage", "Invalid Student Number or Password. Please try again.");
             request.getRequestDispatcher("/student/login.jsp").forward(request, response);
         }
     }
 
-    private Document authenticateUser(String snumber, String password) {
+    private String[] authenticateUserMongoDB(String snumber, String password) {
         try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
             MongoDatabase database = mongo.getDatabase("dbLibraryMS");
             MongoCollection<Document> collection = database.getCollection("Students");
 
-            // Find user with matching student number and password
             Document query = new Document()
                     .append("SNumber", snumber)
                     .append("Password", password);
@@ -64,16 +70,46 @@ public class Login extends HttpServlet {
 
             if (user != null) {
                 System.out.println("User authenticated: " + user.getString("FName") + " " + user.getString("LName"));
+                return new String[]{
+                        user.getString("FName"),
+                        user.getString("LName"),
+                        user.getString("SNumber")
+                };
             } else {
                 System.out.println("Authentication failed for Student Number: " + snumber);
+                return null;
             }
-
-            return user;
         } catch (Exception e) {
             System.err.println("Error during authentication: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
     }
-}
 
+    private String[] authenticateUserSQL(String snumber, String password) {
+        String sql = "SELECT FName, LName, SNumber FROM Students WHERE SNumber = ? AND Password = ?";
+
+        try (Connection conn = SQLClientProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, snumber);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String fname = rs.getString("FName");
+                String lname = rs.getString("LName");
+                String snum = rs.getString("SNumber");
+                System.out.println("User authenticated: " + fname + " " + lname);
+                return new String[]{fname, lname, snum};
+            } else {
+                System.out.println("Authentication failed for Student Number: " + snumber);
+                return null;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error during authentication: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
