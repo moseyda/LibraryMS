@@ -1,6 +1,7 @@
+# !!!!!! UNDER DEVELOPMENT !!!!!!
+
 # Library Management System
 
-Short description
 A project implementing a Library Management System with admin dashboard and student functionalities, using Java servlets, MongoDB and SQL.
 
 ## Tech stack
