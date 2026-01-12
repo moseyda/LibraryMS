@@ -101,39 +101,86 @@ public class ReturnBook extends HttpServlet {
         }
     }
 
-    private Object[] returnBookSQL(String borrowId) throws SQLException {
+    private Object[] returnBookSQL(String borrowId) {
+        if (borrowId == null || borrowId.trim().isEmpty()) {
+            return new Object[]{false, "Missing borrowId"};
+        }
+
+        boolean isNumeric = true;
+        int numericId = -1;
+        try {
+            numericId = Integer.parseInt(borrowId);
+        } catch (NumberFormatException ignored) {
+            isNumeric = false;
+        }
+
         try (Connection conn = SQLClientProvider.getConnection()) {
-            // Get the borrow record to find book_id
-            String selectSql = "SELECT book_id FROM BorrowReturnHist WHERE id = ?";
-            int bookId;
+            try {
+                conn.setAutoCommit(false);
 
-            try (PreparedStatement stmt = conn.prepareStatement(selectSql)) {
-                stmt.setInt(1, Integer.parseInt(borrowId));
-                ResultSet rs = stmt.executeQuery();
-                if (!rs.next()) {
-                    return new Object[]{false, "Borrow record not found"};
+                // select book_id using actual PK column `record_id`
+                String selectSql = "SELECT book_id FROM BorrowReturnHist WHERE id = ?";
+                Integer bookId = null;
+                try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                    if (isNumeric) selectStmt.setInt(1, numericId);
+                    else selectStmt.setString(1, borrowId);
+                    try (ResultSet rs = selectStmt.executeQuery()) {
+                        if (!rs.next()) {
+                            conn.rollback();
+                            return new Object[]{false, "Borrow record not found"};
+                        }
+                        bookId = rs.getInt("book_id");
+                        if (rs.wasNull()) {
+                            conn.rollback();
+                            return new Object[]{false, "Borrow record missing book_id"};
+                        }
+                    }
                 }
-                bookId = rs.getInt("book_id");
+
+                Timestamp actualReturnDate = Timestamp.valueOf(LocalDateTime.now());
+
+                // update borrow record
+                String updateHistSql = "UPDATE BorrowReturnHist SET status = 'returned', actualReturnDate = ? WHERE id = ?";
+                int histUpdated;
+                try (PreparedStatement updateHistStmt = conn.prepareStatement(updateHistSql)) {
+                    updateHistStmt.setTimestamp(1, actualReturnDate);
+                    if (isNumeric) updateHistStmt.setInt(2, numericId);
+                    else updateHistStmt.setString(2, borrowId);
+                    histUpdated = updateHistStmt.executeUpdate();
+                }
+
+                if (histUpdated == 0) {
+                    conn.rollback();
+                    return new Object[]{false, "Borrow record not updated"};
+                }
+
+                // increment available
+                String updateBookSql = "UPDATE Books SET available = available + 1 WHERE book_id = ?";
+                int bookUpdated;
+                try (PreparedStatement updateBookStmt = conn.prepareStatement(updateBookSql)) {
+                    updateBookStmt.setInt(1, bookId);
+                    bookUpdated = updateBookStmt.executeUpdate();
+                }
+
+                if (bookUpdated == 0) {
+                    conn.rollback();
+                    return new Object[]{false, "Book record not found for book_id: " + bookId};
+                }
+
+                conn.commit();
+                return new Object[]{true, null};
+            } catch (SQLException e) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ignore) { }
+                return new Object[]{false, e.getMessage()};
+            } finally {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException ignore) { }
             }
-
-            Timestamp actualReturnDate = Timestamp.valueOf(LocalDateTime.now());
-
-            // Update borrow record
-            String updateHistSql = "UPDATE BorrowReturnHist SET status = 'returned', actualReturnDate = ? WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(updateHistSql)) {
-                stmt.setTimestamp(1, actualReturnDate);
-                stmt.setInt(2, Integer.parseInt(borrowId));
-                stmt.executeUpdate();
-            }
-
-            // Increment available count
-            String updateBookSql = "UPDATE Books SET available = available + 1 WHERE book_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(updateBookSql)) {
-                stmt.setInt(1, bookId);
-                stmt.executeUpdate();
-            }
-
-            return new Object[]{true, null};
+        } catch (SQLException ex) {
+            return new Object[]{false, ex.getMessage()};
         }
     }
 }
