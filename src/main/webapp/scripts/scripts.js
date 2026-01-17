@@ -1,3 +1,38 @@
+function normalizeRecord(rec) {
+    // Handle id: MongoDB uses _id.$oid or _id, SQL uses record_id or id
+    const id = rec.record_id || rec.recordId || rec.id || rec._id?.$oid || rec._id || '';
+
+    // Handle bookId
+    const bookId = rec.book_id || rec.bookId || '';
+
+    // Handle dates: MongoDB wraps in {$date:...}, SQL returns plain strings
+    const parseDate = (d) => {
+        if (!d) return null;
+        if (typeof d === 'object' && d.$date) return d.$date;
+        return d;
+    };
+
+    return {
+        id: String(id),
+        recordId: String(id),
+        bookId: String(bookId),
+        title: rec.title || rec.bookTitle || '',
+        isbn: rec.isbn || rec.ISBN || '',
+        author: rec.author || '',
+        category: rec.category || '',
+        status: (rec.status || 'borrowed').toLowerCase(),
+        borrowDate: parseDate(rec.borrowDate),
+        expectedReturnDate: parseDate(rec.expectedReturnDate),
+        actualReturnDate: parseDate(rec.actualReturnDate),
+        studentNumber: rec.SNumber || rec.studentNumber || rec.student_number || '',
+        firstName: rec.firstName || rec.first_name || '',
+        lastName: rec.lastName || rec.last_name || '',
+        available: rec.available ?? rec.available_copies ?? 0,
+        quantity: rec.quantity ?? rec.total_copies ?? 0
+    };
+}
+
+
 // Book Browsing Modal Script
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('booksModal');
@@ -411,19 +446,28 @@ document.addEventListener('DOMContentLoaded', function () {
 // admin-loans.js
 document.addEventListener('DOMContentLoaded', () => {
     const ctx = window.APP_CTX || '';
+    if (!document.getElementById('loansTableBody')) return;
+
     loadLoans();
 
     async function loadLoans(status = '') {
         const body = document.getElementById('loansTableBody');
         if (!body) return;
         body.innerHTML = `<tr><td colspan="7" style="padding:1rem;color:#64748b;">Loading...</td></tr>`;
+
         try {
             const url = `${ctx}/admin/loansActivity${status ? `?status=${encodeURIComponent(status)}` : ''}`;
             const res = await fetch(url);
-            if (!res.ok) throw new Error('Failed to fetch loans');
+            if (!res.ok) throw new Error('Failed to fetch loans: ' + res.status);
+
             const data = await res.json();
-            renderLoans(data);
+            // Handle both array response and wrapped response
+            const rawRecords = Array.isArray(data) ? data : (data.loans || data.records || []);
+            const records = rawRecords.map(normalizeRecord);
+
+            renderLoans(records);
         } catch (e) {
+            console.error('loadLoans error:', e);
             body.innerHTML = `<tr><td colspan="7" style="padding:1rem;color:#ef4444;">Error loading loans</td></tr>`;
         }
     }
@@ -438,77 +482,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         body.innerHTML = records.map(r => {
-            const id = getId(r._id);
             const borrower = [r.firstName, r.lastName].filter(Boolean).join(' ') || 'N/A';
-            const sNum = r.SNumber ? ` <small style="color:#6b7280;">(${escapeHtml(r.SNumber)})</small>` : '';
-            const borrowed = formatDateTime(r.borrowDate?.$date || r.borrowDate);
-            const expected = formatDateTime(r.expectedReturnDate?.$date || r.expectedReturnDate);
-            const returned = r.actualReturnDate ? formatDateTime(r.actualReturnDate?.$date || r.actualReturnDate) : null;
+            const sNum = r.studentNumber ? ` <small style="color:#6b7280;">(${escapeHtml(r.studentNumber)})</small>` : '';
+            const borrowed = formatDateTime(r.borrowDate);
+            const expected = formatDateTime(r.expectedReturnDate);
+            const returned = r.actualReturnDate ? formatDateTime(r.actualReturnDate) : null;
 
-            const rawStatus = (r.status || '').toLowerCase();
-            const uiStatus = ['borrowed', 'returned', 'overdue'].includes(rawStatus)
-                ? rawStatus
-                : 'borrowed';
-
+            const uiStatus = ['borrowed', 'returned', 'overdue'].includes(r.status) ? r.status : 'borrowed';
             const isBorrowedLike = uiStatus === 'borrowed' || uiStatus === 'overdue';
 
-            const cssClass =
-                uiStatus === 'overdue' ? 'overdue' :
-                    uiStatus === 'returned' ? 'returned' :
-                        'borrowed';
+            const cssClass = uiStatus === 'overdue' ? 'overdue' : uiStatus === 'returned' ? 'returned' : 'borrowed';
+            const label = uiStatus === 'overdue' ? 'Overdue' : uiStatus === 'returned' ? 'Returned' : 'Borrowed';
 
-            const label =
-                uiStatus === 'overdue' ? 'Overdue' :
-                    uiStatus === 'returned' ? 'Returned' :
-                        'Borrowed';
+            const statusBadge = `<span class="book-status ${cssClass}">${label}</span>` +
+                (returned ? `<div style="font-size:0.75rem;color:#6b7280;margin-top:0.25rem;">Returned: ${returned}</div>` : '');
 
-            const statusBadge =
-                `<span class="book-status ${cssClass}">${label}</span>` +
-                (returned
-                    ? `<div style="font-size:0.75rem;color:#6b7280;margin-top:0.25rem;">Returned: ${returned}</div>`
-                    : '');
-
+            // Use recordId for Mongo, bookId for SQL — send both for compatibility
             const actions = isBorrowedLike
-                ? `<button class="btn-delete" onclick="adminReturnBook('${id}')">Mark Returned</button>`
+                ? `<button class="btn-delete" 
+                           data-record-id="${escapeHtml(r.recordId)}"
+                           data-book-id="${escapeHtml(r.bookId)}"
+                           onclick="adminReturnBook('${escapeHtml(r.recordId || r.bookId)}', '${escapeHtml(r.bookId)}')">
+                       Mark Returned
+                   </button>`
                 : `<span style="color:#9ca3af;">—</span>`;
 
             return `
-        <tr>
-          <td style="padding:1rem;">${escapeHtml(r.title || 'Unknown')}</td>
-          <td style="padding:1rem;">${escapeHtml(r.isbn || 'N/A')}</td>
-          <td style="padding:1rem;">${escapeHtml(borrower)}${sNum}</td>
-          <td style="padding:1rem;">${borrowed}</td>
-          <td style="padding:1rem;">${expected}</td>
-          <td style="padding:1rem;">${statusBadge}</td>
-          <td style="padding:1rem;">${actions}</td>
-        </tr>`;
+            <tr>
+              <td style="padding:1rem;">${escapeHtml(r.title || 'Unknown')}</td>
+              <td style="padding:1rem;">${escapeHtml(r.isbn || 'N/A')}</td>
+              <td style="padding:1rem;">${escapeHtml(borrower)}${sNum}</td>
+              <td style="padding:1rem;">${borrowed}</td>
+              <td style="padding:1rem;">${expected}</td>
+              <td style="padding:1rem;">${statusBadge}</td>
+              <td style="padding:1rem;">${actions}</td>
+            </tr>`;
         }).join('');
     }
 
-    window.adminReturnBook = async function(borrowId) {
+    window.adminReturnBook = async function(recordId, bookId) {
         try {
+            const params = new URLSearchParams();
+            // Send both params for SQL/Mongo compatibility
+            if (recordId) params.append('borrowId', recordId);
+            if (bookId) params.append('bookId', bookId);
+
             const res = await fetch(`${ctx}/returnBook`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ borrowId })
+                body: params.toString()
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to mark returned');
             if (window.showToast) showToast('Book marked as returned', 'success');
             loadLoans();
         } catch (e) {
+            console.error('adminReturnBook error:', e);
             if (window.showToast) showToast('Error marking as returned', 'error');
         }
     };
 
-    function getId(maybeObjId) { return maybeObjId?.$oid || maybeObjId || ''; }
-    function escapeHtml(text) { const d = document.createElement('div'); d.textContent = text ?? ''; return d.innerHTML; }
+    window.loadLoans = loadLoans;
+
+    function escapeHtml(text) {
+        const d = document.createElement('div');
+        d.textContent = text ?? '';
+        return d.innerHTML;
+    }
+
     function formatDateTime(date) {
         if (!date) return 'N/A';
         const d = new Date(date);
+        if (isNaN(d.getTime())) return 'N/A';
         return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 });
+
 
 
 
@@ -535,41 +584,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchDataAndRender() {
         try {
-            const [books, loans] = await Promise.all([
-                fetch(ctxPath + '/browseBooks').then(r => r.ok ? r.json() : []).catch(() => []),
-                fetch(ctxPath + '/admin/loansActivity').then(r => r.ok ? r.json() : []).catch(() => [])
+            const [booksRes, loansRes] = await Promise.all([
+                fetch(`${ctxPath}/admin/getBooks`),
+                fetch(`${ctxPath}/admin/loansActivity`)
             ]);
 
-            // Store for re-rendering on button click
+            if (!booksRes.ok || !loansRes.ok) throw new Error('Fetch failed');
+
+            const booksData = await booksRes.json();
+            const loansData = await loansRes.json();
+
+            // Normalize: handle array or wrapped response
+            const rawBooks = Array.isArray(booksData) ? booksData : (booksData.books || []);
+            const rawLoans = Array.isArray(loansData) ? loansData : (loansData.loans || loansData.records || []);
+
+            const books = rawBooks.map(normalizeRecord);
+            const loans = rawLoans.map(normalizeRecord);
+
+            // Store for chart re-render
             window.__lastLoansData = loans;
 
-            // --- KPIs ---
-            const totalCopies = books.reduce((sum, b) => sum + (Number(b.quantity || 0)), 0);
-            const availableCopies = books.reduce((sum, b) => sum + (Number(b.available || 0)), 0);
+            // Calculate KPIs
+            const totalCopies = books.reduce((sum, b) => sum + (b.quantity || 0), 0);
+            const availableCopies = books.reduce((sum, b) => sum + (b.available || 0), 0);
+            const activeLoans = loans.filter(l => l.status === 'borrowed' || l.status === 'overdue');
+            const overdueLoans = loans.filter(l => l.status === 'overdue');
 
-            const activeLoans = loans.filter(l => String(l.status || '').toLowerCase() === 'borrowed');
-            const now = new Date();
-            const overdueLoans = activeLoans.filter(l => {
-                const exp = new Date(l.expectedReturnDate?.$date || l.expectedReturnDate);
-                return exp instanceof Date && !isNaN(exp) && exp < now;
-            });
-
-            setNum(els.total, totalCopies);
+            setNum(els.total, books.length);
             setNum(els.available, availableCopies);
             setNum(els.active, activeLoans.length);
             setNum(els.overdue, overdueLoans.length);
 
             const rate = totalCopies > 0 ? Math.round((availableCopies / totalCopies) * 100) : 0;
-            els.rateText.textContent = `${rate}% available`;
-            els.rateBar.style.width = `${rate}%`;
+            if (els.rateText) els.rateText.textContent = `${rate}% available`;
+            if (els.rateBar) els.rateBar.style.width = `${rate}%`;
 
-            // --- Chart ---
             drawActivityChart(loans, selectedDays);
-
         } catch (err) {
             console.error('Failed to fetch dashboard data:', err);
         }
     }
+
 
     function setNum(el, n) {
         if (el) el.textContent = Number(n || 0).toLocaleString();
