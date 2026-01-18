@@ -501,6 +501,8 @@
 
 
 
+<script>window.APP_CTX='${pageContext.request.contextPath}';</script>
+<script src="<%= request.getContextPath() %>/scripts/scripts.js?v=1.0"></script>
 
 <script>
     let deleteBookId = null;
@@ -664,7 +666,6 @@
 
 
 </script>
-<script>window.APP_CTX='${pageContext.request.contextPath}';</script>
 <script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>
 
 

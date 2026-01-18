@@ -1,3 +1,37 @@
+(function() {
+    if (typeof window.ctxPath === 'undefined') {
+        window.ctxPath = (typeof window.APP_CTX !== 'undefined')
+            ? window.APP_CTX
+            : (document.currentScript && document.currentScript.dataset && document.currentScript.dataset.appctx) || '';
+    }
+})();
+
+// Example safe fetch for books
+fetch(`${ctxPath}/admin/getBooks`)
+    .then(response => {
+        if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+        return response.json();
+    })
+    .then(data => {
+        // handle books (data.books expected)
+        console.log('Books loaded:', data);
+    })
+    .catch(err => {
+        console.error('Failed to load books:', err);
+    });
+
+// Common utility to escape HTML
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+
 function normalizeRecord(rec) {
     // Handle id: MongoDB uses _id.$oid or _id, SQL uses record_id or id
     const id = rec.record_id || rec.recordId || rec.id || rec._id?.$oid || rec._id || '';
@@ -443,6 +477,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// Helper: safe parse JSON even if response body is empty or invalid
+async function safeParseJson(response) {
+    try {
+        const text = await response.text();
+        if (!text) return null;
+        return JSON.parse(text);
+    } catch (e) {
+        console.warn('safeParseJson: invalid JSON', e);
+        return null;
+    }
+}
+
+// Helper: get an ID string from various shapes (Mongo {$oid}, plain string, SQL id fields)
+function getIdString(obj) {
+    if (!obj && obj !== 0) return '';
+    // if object with $oid
+    if (typeof obj === 'object') {
+        if (obj.$oid) return String(obj.$oid);
+        // if object already a string-like (rare)
+        if (obj.toString && obj.toString() !== '[object Object]') return String(obj);
+        return '';
+    }
+    return String(obj);
+}
+
+// Helper: short display id prefix (safe substring)
+function getShortId(obj, len = 8) {
+    const id = getIdString(obj);
+    return id ? id.substring(0, Math.min(len, id.length)).toUpperCase() : '';
+}
+
 // admin-loans.js
 document.addEventListener('DOMContentLoaded', () => {
     const ctx = window.APP_CTX || '';
@@ -460,10 +525,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(url);
             if (!res.ok) throw new Error('Failed to fetch loans: ' + res.status);
 
-            const data = await res.json();
-            // Handle both array response and wrapped response
+            const data = await safeParseJson(res) || [];
             const rawRecords = Array.isArray(data) ? data : (data.loans || data.records || []);
-            const records = rawRecords.map(normalizeRecord);
+            const records = (rawRecords || []).map(normalizeRecord);
 
             renderLoans(records);
         } catch (e) {
@@ -561,7 +625,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// Analytics Dashboard View - Admin Dashboard Page
 document.addEventListener('DOMContentLoaded', function () {
     if (!document.body.classList.contains('admin-dashboard-page')) return;
 
@@ -580,6 +643,38 @@ document.addEventListener('DOMContentLoaded', function () {
     let activityChart = null;
     let selectedDays = 7;
 
+
+    function normalizeBook(b) {
+        return {
+            id: b.book_id || b.bookId || b._id || '',
+            title: b.title || '',
+            author: b.author || '',
+            isbn: b.isbn || b.ISBN || '',
+            category: b.category || '',
+            available: parseInt(b.available ?? 0, 10),
+            quantity: parseInt(b.quantity ?? 0, 10)
+        };
+    }
+
+    function normalizeLoan(rec) {
+        const parseDate = (d) => {
+            if (!d) return null;
+            if (typeof d === 'object' && d.$date) return new Date(d.$date);
+            return new Date(d);
+        };
+
+        return {
+            id: rec.record_id || rec.recordId || rec.id || rec._id?.$oid || rec._id || '',
+            bookId: rec.book_id || rec.bookId || '',
+            title: rec.title || rec.bookTitle || '',
+            status: (rec.status || 'borrowed').toLowerCase(),
+            borrowDate: parseDate(rec.borrowDate || rec.borrow_date),
+            expectedReturnDate: parseDate(rec.expectedReturnDate || rec.expected_return_date),
+            actualReturnDate: parseDate(rec.actualReturnDate || rec.actual_return_date)
+        };
+    }
+
+
     fetchDataAndRender();
 
     async function fetchDataAndRender() {
@@ -589,22 +684,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 fetch(`${ctxPath}/admin/loansActivity`)
             ]);
 
-            if (!booksRes.ok || !loansRes.ok) throw new Error('Fetch failed');
+            if (!booksRes.ok) {
+                console.error('Books fetch failed:', booksRes.status);
+                return;
+            }
+            if (!loansRes.ok) {
+                console.error('Loans fetch failed:', loansRes.status);
+                return;
+            }
 
-            const booksData = await booksRes.json();
-            const loansData = await loansRes.json();
+            const booksData = await safeParseJson(booksRes);
+            const loansData = await safeParseJson(loansRes);
 
-            // Normalize: handle array or wrapped response
-            const rawBooks = Array.isArray(booksData) ? booksData : (booksData.books || []);
-            const rawLoans = Array.isArray(loansData) ? loansData : (loansData.loans || loansData.records || []);
+            const rawBooks = Array.isArray(booksData) ? booksData : (booksData && (booksData.books || booksData.data)) || [];
+            const rawLoans = Array.isArray(loansData) ? loansData : (loansData && (loansData.loans || loansData.records || loansData.data)) || [];
 
-            const books = rawBooks.map(normalizeRecord);
-            const loans = rawLoans.map(normalizeRecord);
+            const books = rawBooks.map(normalizeBook);
+            const loans = rawLoans.map(normalizeLoan);
 
-            // Store for chart re-render
             window.__lastLoansData = loans;
 
-            // Calculate KPIs
             const totalCopies = books.reduce((sum, b) => sum + (b.quantity || 0), 0);
             const availableCopies = books.reduce((sum, b) => sum + (b.available || 0), 0);
             const activeLoans = loans.filter(l => l.status === 'borrowed' || l.status === 'overdue');
@@ -625,24 +724,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
     function setNum(el, n) {
         if (el) el.textContent = Number(n || 0).toLocaleString();
     }
 
-    // NEW: Filter button listeners
+    // Chart filter buttons
     document.querySelectorAll('.chart-filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const days = Number(btn.dataset.days);
-
-            // Highlight active button
-            document.querySelectorAll('.chart-filter-btn')
-                .forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            selectedDays = days;
-
-            // Re-render chart using last fetched data
+            selectedDays = parseInt(btn.dataset.days || '7', 10);
             if (window.__lastLoansData) {
                 drawActivityChart(window.__lastLoansData, selectedDays);
             }
@@ -650,9 +741,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function drawActivityChart(loans, daysRange = 7) {
-        if (!els.chart) return;
+        if (!els.chart || typeof echarts === 'undefined') return;
 
-        // Prepare buckets ending today
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -663,22 +753,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const borrowsCounts = days.map(d => {
-            const start = new Date(d);
-            const end = new Date(d);
-            end.setDate(start.getDate() + 1);
             return loans.filter(l => {
-                const bd = new Date(l.borrowDate?.$date || l.borrowDate);
-                return bd >= start && bd < end;
+                if (!l.borrowDate) return false;
+                const bd = new Date(l.borrowDate);
+                return bd.toDateString() === d.toDateString();
             }).length;
         });
 
         const returnsCounts = days.map(d => {
-            const start = new Date(d);
-            const end = new Date(d);
-            end.setDate(start.getDate() + 1);
             return loans.filter(l => {
-                const rd = l.actualReturnDate ? new Date(l.actualReturnDate?.$date || l.actualReturnDate) : null;
-                return rd && rd >= start && rd < end;
+                if (!l.actualReturnDate) return false;
+                const rd = new Date(l.actualReturnDate);
+                return rd.toDateString() === d.toDateString();
             }).length;
         });
 
@@ -689,37 +775,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const option = {
-            color: ['#6366F1', '#10B981'],
-            tooltip: { trigger: 'axis', backgroundColor: '#111827', textStyle: { color: '#fff' } },
-            legend: { data: ['Borrows', 'Returns'], textStyle: { color: '#374151' } },
-            grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-            xAxis: { type: 'category', boundaryGap: false, data: labels, axisLine: { lineStyle: { color: '#475569' } }, axisTick: { show: false } },
-            yAxis: { type: 'value', axisLine: { lineStyle: { color: '#475569' } }, splitLine: { lineStyle: { color: 'rgba(203,213,225,0.35)' } } },
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['Borrows', 'Returns'], bottom: 0 },
+            xAxis: { type: 'category', data: labels },
+            yAxis: { type: 'value', minInterval: 1 },
             series: [
-                {
-                    name: 'Borrows',
-                    type: 'line',
-                    smooth: true,
-                    data: borrowsCounts,
-                    areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(99,102,241,0.45)' }, { offset: 1, color: 'rgba(99,102,241,0)' }]) },
-                    lineStyle: { width: 3 }
-                },
-                {
-                    name: 'Returns',
-                    type: 'line',
-                    smooth: true,
-                    data: returnsCounts,
-                    areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(16,185,129,0.45)' }, { offset: 1, color: 'rgba(16,185,129,0)' }]) },
-                    lineStyle: { width: 3 }
-                }
+                { name: 'Borrows', type: 'line', smooth: true, data: borrowsCounts, itemStyle: { color: '#6366f1' } },
+                { name: 'Returns', type: 'line', smooth: true, data: returnsCounts, itemStyle: { color: '#22c55e' } }
             ]
         };
+
         activityChart.clear();
         activityChart.resize();
         activityChart.setOption(option);
     }
 });
-
 
 
 // Toast Notification Function
@@ -1140,10 +1210,10 @@ function loadPaymentHistory() {
     container.innerHTML = '<div class="loading" style="padding:2rem;text-align:center;color:#64748b;">Loading payment history...</div>';
 
     fetch(`${window.APP_CTX}/student/getPaymentHistory`)
-        .then(response => response.json())
+        .then(response => response.json().catch(() => null))
         .then(data => {
-            if (data.success) {
-                if (data.payments.length === 0) {
+            if (data && data.success) {
+                if (!data.payments || data.payments.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state-fines">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1154,43 +1224,42 @@ function loadPaymentHistory() {
                         </div>
                     `;
                 } else {
-                    container.innerHTML = data.payments.map(payment => `
-                        <div class="payment-history-item">
-                            <div class="payment-receipt-header">
-                                <div class="receipt-id">Receipt #${payment._id.$oid.substring(0, 8).toUpperCase()}</div>
-                                <span class="receipt-status ${payment.status}">${payment.status.toUpperCase()}</span>
-                            </div>
-                            <div class="receipt-details">
-                                <div class="receipt-detail-row">
-                                    <span class="receipt-detail-label">Payment Date:</span>
-                                    <span class="receipt-detail-value">${formatDateTime(payment.actualPaymentDate)}</span>
+                    container.innerHTML = data.payments.map(payment => {
+                        const rid = getShortId(payment._id || payment.id || payment._oid);
+                        const status = payment.status || 'unknown';
+                        const total = typeof payment.totalAmount === 'number' ? payment.totalAmount : (payment.totalAmount ? Number(payment.totalAmount) : 0);
+                        const booksHtml = (Array.isArray(payment.books) ? payment.books : []).map(b => `<div class="receipt-book-item"><svg ...></svg><span>${escapeHtml(b.title || '')} (${escapeHtml(b.isbn || '')})</span></div>`).join('');
+                        return `
+                            <div class="payment-history-item">
+                                <div class="payment-receipt-header">
+                                    <div class="receipt-id">Receipt #${rid}</div>
+                                    <span class="receipt-status ${escapeHtml(status)}">${escapeHtml(String(status).toUpperCase())}</span>
                                 </div>
-                                <div class="receipt-detail-row">
-                                    <span class="receipt-detail-label">Student Number:</span>
-                                    <span class="receipt-detail-value">${payment.studentNumber}</span>
-                                </div>
-                                <div class="receipt-detail-row">
-                                    <span class="receipt-detail-label">Full Name:</span>
-                                    <span class="receipt-detail-value">${payment.fullName}</span>
-                                </div>
-                            </div>
-                            <div class="receipt-books-list">
-                                <div class="receipt-books-title">Books Paid For:</div>
-                                ${payment.books.map(book => `
-                                    <div class="receipt-book-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                                        </svg>
-                                        <span>${book.title} (${book.isbn})</span>
+                                <div class="receipt-details">
+                                    <div class="receipt-detail-row">
+                                        <span class="receipt-detail-label">Payment Date:</span>
+                                        <span class="receipt-detail-value">${formatDateTime(payment.actualPaymentDate)}</span>
                                     </div>
-                                `).join('')}
+                                    <div class="receipt-detail-row">
+                                        <span class="receipt-detail-label">Student Number:</span>
+                                        <span class="receipt-detail-value">${escapeHtml(payment.studentNumber || '')}</span>
+                                    </div>
+                                    <div class="receipt-detail-row">
+                                        <span class="receipt-detail-label">Full Name:</span>
+                                        <span class="receipt-detail-value">${escapeHtml(payment.fullName || '')}</span>
+                                    </div>
+                                </div>
+                                <div class="receipt-books-list">
+                                    <div class="receipt-books-title">Books Paid For:</div>
+                                    ${booksHtml}
+                                </div>
+                                <div class="receipt-total">
+                                    <span class="receipt-total-label">Total Paid:</span>
+                                    <span class="receipt-total-amount">£${(total).toFixed(2)}</span>
+                                </div>
                             </div>
-                            <div class="receipt-total">
-                                <span class="receipt-total-label">Total Paid:</span>
-                                <span class="receipt-total-amount">£${payment.totalAmount.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
             } else {
                 container.innerHTML = '<div style="padding:2rem;text-align:center;color:#dc2626;">Error loading payment history</div>';
@@ -1225,21 +1294,35 @@ if (document.querySelector('.dashboard-container')) {
 // Load Fines Activity
 function loadFinesActivity() {
     fetch(`${window.APP_CTX}/admin/getFinesActivity`)
-        .then(response => response.json())
+        .then(res => res.ok ? res.json().catch(() => null) : Promise.reject('bad response'))
         .then(data => {
             const tbody = document.getElementById('finesTableBody');
-            if (data.success && data.fines.length > 0) {
-                tbody.innerHTML = data.fines.map(fine => `
+            if (!data || !data.success || !Array.isArray(data.fines) || data.fines.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No fines recorded yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.fines.map(fine => {
+                const shortId = getShortId(fine._id || fine.id || fine.fine_id);
+                const receiptId = shortId ? `#${shortId}` : '#UNKNOWN';
+                const totalAmount = typeof fine.totalAmount === 'number' ? fine.totalAmount : (fine.totalAmount ? Number(fine.totalAmount) : 0);
+                const status = fine.status || 'unknown';
+
+                // prepare safe JSON-stringified object for adjust button without throwing
+                let finePayload = {};
+                try { finePayload = fine; } catch (e) { finePayload = { id: fine.id || fine._id }; }
+
+                return `
                     <tr>
-                        <td>#${fine._id.$oid.substring(0, 8).toUpperCase()}</td>
-                        <td>${fine.studentNumber}</td>
-                        <td><strong>${fine.fullName}</strong></td>
-                        <td>${fine.books.length} book(s)</td>
-                        <td><strong>£${fine.totalAmount.toFixed(2)}</strong></td>
-                        <td><span class="category-badge">${fine.status}</span></td>
+                        <td>${receiptId}</td>
+                        <td>${escapeHtml(fine.studentNumber || '')}</td>
+                        <td><strong>${escapeHtml(fine.fullName || '')}</strong></td>
+                        <td>${Array.isArray(fine.books) ? fine.books.length : (fine.books ? String(fine.books).length : 0)} book(s)</td>
+                        <td><strong>£${(totalAmount).toFixed(2)}</strong></td>
+                        <td><span class="category-badge">${escapeHtml(status)}</span></td>
                         <td>${formatDateTime(fine.actualPaymentDate)}</td>
                         <td>
-                            <button class="btn-edit" onclick='openAdjustFineModal(${JSON.stringify(fine)})'>
+                            <button class="btn-edit" onclick='openAdjustFineModal(${escapeHtml(JSON.stringify(finePayload))})'>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -1247,10 +1330,8 @@ function loadFinesActivity() {
                             </button>
                         </td>
                     </tr>
-                `).join('');
-            } else {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No fines recorded yet</td></tr>';
-            }
+                `;
+            }).join('');
         })
         .catch(error => {
             console.error('Error loading fines:', error);
@@ -1260,9 +1341,16 @@ function loadFinesActivity() {
 }
 
 function openAdjustFineModal(fine) {
-    document.getElementById('adjust_fineId').value = fine._id.$oid;
-    document.getElementById('adjust_currentAmount').value = `£${fine.totalAmount.toFixed(2)}`;
-    document.getElementById('adjust_newAmount').value = fine.totalAmount;
+    // fine may be an object or a JSON string from onclick; ensure object
+    let f = fine;
+    if (typeof fine === 'string') {
+        try { f = JSON.parse(fine); } catch (e) { f = { _id: fine }; }
+    }
+
+    const fullId = getIdString(f._id || f.id || f.fine_id);
+    document.getElementById('adjust_fineId').value = fullId || '';
+    document.getElementById('adjust_currentAmount').value = `£${(f.totalAmount ? Number(f.totalAmount) : 0).toFixed(2)}`;
+    document.getElementById('adjust_newAmount').value = (f.totalAmount ? Number(f.totalAmount) : 0);
     document.getElementById('adjustFineModal').style.display = 'flex';
 }
 

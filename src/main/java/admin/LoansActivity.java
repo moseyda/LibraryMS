@@ -100,8 +100,8 @@ public class LoansActivity extends HttpServlet {
             Date now = new Date();
 
             while (rs.next()) {
-                Timestamp expectedReturn = rs.getTimestamp("expectedReturnDate");
-                Timestamp actualReturn = rs.getTimestamp("actualReturnDate");
+                java.sql.Timestamp expectedReturn = rs.getTimestamp("expectedReturnDate");
+                java.sql.Timestamp actualReturn = rs.getTimestamp("actualReturnDate");
                 String dbStatus = rs.getString("status");
 
                 String computedStatus = computeStatusSQL(expectedReturn, actualReturn, dbStatus, now);
@@ -114,13 +114,16 @@ public class LoansActivity extends HttpServlet {
                 JSONObject obj = new JSONObject();
                 obj.put("record_id", rs.getInt("record_id"));
                 obj.put("SNumber", rs.getString("SNumber"));
+                obj.put("isbn", rs.getString("isbn"));
+                obj.put("title", rs.getString("title"));
+                obj.put("firstName", rs.getString("firstName"));
+                obj.put("lastName", rs.getString("lastName"));
                 obj.put("book_id", rs.getInt("book_id"));
-                obj.put("borrowDate", rs.getTimestamp("borrowDate") != null ? rs.getTimestamp("borrowDate").getTime() : null);
-                obj.put("dueDate", rs.getTimestamp("dueDate") != null ? rs.getTimestamp("dueDate").getTime() : null);
-                obj.put("expectedReturnDate", expectedReturn != null ? expectedReturn.getTime() : null);
-                obj.put("actualReturnDate", actualReturn != null ? actualReturn.getTime() : null);
-                obj.put("returnDate", rs.getTimestamp("returnDate") != null ? rs.getTimestamp("returnDate").getTime() : null);
+                obj.put("borrowDate", rs.getTimestamp("borrowDate") != null ? rs.getTimestamp("borrowDate").getTime() : JSONObject.NULL);
+                obj.put("expectedReturnDate", expectedReturn != null ? expectedReturn.getTime() : JSONObject.NULL);
+                obj.put("actualReturnDate", actualReturn != null ? actualReturn.getTime() : JSONObject.NULL);
                 obj.put("status", computedStatus);
+
                 jsonArray.put(obj);
             }
 

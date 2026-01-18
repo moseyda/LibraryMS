@@ -31,6 +31,16 @@
         <url-pattern>/admin/updateFineAmount</url-pattern>
     </servlet-mapping>
 
+    <!-- No Cache Filter for Scripts -->
+    <filter>
+        <filter-name>NoCacheFilter</filter-name>
+        <filter-class>configs.NoCacheFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>NoCacheFilter</filter-name>
+        <url-pattern>/scripts/*</url-pattern>
+    </filter-mapping>
+
     <!-- Student Profile Management -->
     <servlet>
         <servlet-name>Profile</servlet-name>

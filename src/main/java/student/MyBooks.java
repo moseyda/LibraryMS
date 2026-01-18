@@ -79,7 +79,8 @@ public class MyBooks extends HttpServlet {
     }
 
     private String getMyBooksSQL(String studentNumber) throws SQLException {
-        String sql = "SELECT h.*, b.title, b.isbn FROM BorrowReturnHist h " +
+        String sql = "SELECT h.record_id, h.SNumber, h.firstName, h.lastName, h.borrowDate, h.expectedReturnDate, h.actualReturnDate, h.status, b.title, b.isbn " +
+                "FROM BorrowReturnHist h " +
                 "JOIN Books b ON h.book_id = b.book_id " +
                 "WHERE h.SNumber = ? AND h.status = 'borrowed'";
 
@@ -93,14 +94,20 @@ public class MyBooks extends HttpServlet {
 
             while (rs.next()) {
                 JSONObject book = new JSONObject();
+
+                // Provide a Mongo-like _id object so frontend code expecting _id.$oid still works
+                JSONObject idObj = new JSONObject();
+                idObj.put("$oid", String.valueOf(rs.getInt("record_id")));
+                book.put("_id", idObj);
+
                 book.put("isbn", rs.getString("isbn"));
                 book.put("title", rs.getString("title"));
                 book.put("SNumber", rs.getString("SNumber"));
                 book.put("firstName", rs.getString("firstName"));
                 book.put("lastName", rs.getString("lastName"));
-                book.put("borrowDate", rs.getDate("borrowDate") != null ? rs.getDate("borrowDate").toString() : null);
-                book.put("expectedReturnDate", rs.getDate("expectedReturnDate") != null ? rs.getDate("expectedReturnDate").toString() : null);
-                book.put("actualReturnDate", rs.getDate("actualReturnDate") != null ? rs.getDate("actualReturnDate").toString() : null);
+                book.put("borrowDate", rs.getTimestamp("borrowDate") != null ? rs.getTimestamp("borrowDate").toString() : null);
+                book.put("expectedReturnDate", rs.getTimestamp("expectedReturnDate") != null ? rs.getTimestamp("expectedReturnDate").toString() : null);
+                book.put("actualReturnDate", rs.getTimestamp("actualReturnDate") != null ? rs.getTimestamp("actualReturnDate").toString() : null);
                 book.put("status", rs.getString("status"));
                 books.put(book);
             }

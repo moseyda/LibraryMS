@@ -15,11 +15,11 @@ import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -119,7 +119,7 @@ public class ReturnBook extends HttpServlet {
                 conn.setAutoCommit(false);
 
                 // select book_id using actual PK column `record_id`
-                String selectSql = "SELECT book_id FROM BorrowReturnHist WHERE id = ?";
+                String selectSql = "SELECT book_id FROM BorrowReturnHist WHERE record_id = ?";
                 Integer bookId = null;
                 try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
                     if (isNumeric) selectStmt.setInt(1, numericId);
@@ -137,10 +137,10 @@ public class ReturnBook extends HttpServlet {
                     }
                 }
 
-                Timestamp actualReturnDate = Timestamp.valueOf(LocalDateTime.now());
+                java.sql.Timestamp actualReturnDate = Timestamp.valueOf(LocalDateTime.now());
 
-                // update borrow record
-                String updateHistSql = "UPDATE BorrowReturnHist SET status = 'returned', actualReturnDate = ? WHERE id = ?";
+                // update borrow record using record_id
+                String updateHistSql = "UPDATE BorrowReturnHist SET status = 'returned', actualReturnDate = ? WHERE record_id = ?";
                 int histUpdated;
                 try (PreparedStatement updateHistStmt = conn.prepareStatement(updateHistSql)) {
                     updateHistStmt.setTimestamp(1, actualReturnDate);
@@ -172,12 +172,14 @@ public class ReturnBook extends HttpServlet {
             } catch (SQLException e) {
                 try {
                     conn.rollback();
-                } catch (SQLException ignore) { }
+                } catch (SQLException ignore) {
+                }
                 return new Object[]{false, e.getMessage()};
             } finally {
                 try {
                     conn.setAutoCommit(true);
-                } catch (SQLException ignore) { }
+                } catch (SQLException ignore) {
+                }
             }
         } catch (SQLException ex) {
             return new Object[]{false, ex.getMessage()};
