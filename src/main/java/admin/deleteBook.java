@@ -23,17 +23,20 @@ import java.sql.SQLException;
 
 @WebServlet(name = "deleteBook", value = "/admin/deleteBook")
 public class deleteBook extends HttpServlet {
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
 
-        try {
+        try (PrintWriter out = response.getWriter()) {
+
             String bookId = request.getParameter("bookId");
-
             System.out.println("Deleting book ID: " + bookId);
 
+            /* ---- Basic validation (unchanged user message) ---- */
             if (bookId == null || bookId.trim().isEmpty()) {
                 out.write("{\"success\": false, \"error\": \"Book ID is required\"}");
                 return;
@@ -55,42 +58,58 @@ public class deleteBook extends HttpServlet {
             }
 
         } catch (IllegalArgumentException e) {
+            // Covers invalid ObjectId OR invalid numeric ID
             System.out.println("Invalid book ID: " + e.getMessage());
-            out.write("{\"success\": false, \"error\": \"Invalid book ID\"}");
+            response.getWriter()
+                    .write("{\"success\": false, \"error\": \"Invalid book ID\"}");
+
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            // True unexpected failures only
             e.printStackTrace();
-            out.write("{\"success\": false, \"error\": \"" + e.getMessage().replace("\"", "'") + "\"}");
-        } finally {
-            out.flush();
+            response.getWriter()
+                    .write("{\"success\": false, \"error\": \"Internal server error\"}");
         }
     }
 
-    // MongoDB implementation
+    /* ===================== MongoDB ===================== */
     private boolean deleteBookMongoDB(String bookId) {
+
+        // Explicit ObjectId validation (cleaner failure mode)
+        if (!ObjectId.isValid(bookId)) {
+            throw new IllegalArgumentException("Invalid MongoDB ObjectId");
+        }
+
         try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
+
             MongoDatabase database = mongo.getDatabase("dbLibraryMS");
             MongoCollection<Document> collection = database.getCollection("Books");
 
-            DeleteResult result = collection.deleteOne(new Document("_id", new ObjectId(bookId)));
-            return result.getDeletedCount() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            DeleteResult result =
+                    collection.deleteOne(new Document("_id", new ObjectId(bookId)));
+
+            return result.wasAcknowledged() && result.getDeletedCount() > 0;
         }
     }
 
-    // SQL implementation
+    /* ===================== SQL ===================== */
     private boolean deleteBookSQL(String bookId) {
+
         String sql = "DELETE FROM Books WHERE book_id = ?";
+
+        int parsedId;
+        try {
+            parsedId = Integer.parseInt(bookId);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid SQL book ID");
+        }
 
         try (Connection conn = SQLClientProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, Integer.parseInt(bookId));
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException | NumberFormatException e) {
+            stmt.setInt(1, parsedId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }

@@ -1,6 +1,7 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.mongodb.client.*, org.bson.Document, java.util.ArrayList, java.util.List" %>
+<%@ page import="configs.DatabaseConfig, configs.SQLClientProvider" %>
+<%@ page import="java.sql.Connection, java.sql.PreparedStatement, java.sql.ResultSet" %>
 <%
     // Check if admin is logged in
     Boolean adminLoggedIn = (Boolean) session.getAttribute("adminLoggedIn");
@@ -12,14 +13,41 @@
     String adminUsername = (String) session.getAttribute("adminUsername");
     String adminRole = (String) session.getAttribute("adminRole");
 
-    // Fetch books from database
+    // Fetch books from database based on config
     List<Document> books = new ArrayList<>();
-    try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
-        MongoDatabase database = mongo.getDatabase("dbLibraryMS");
-        MongoCollection<Document> collection = database.getCollection("Books");
-        collection.find().into(books);
-    } catch (Exception e) {
-        e.printStackTrace();
+
+    if (DatabaseConfig.isMongoDB()) {
+        // MongoDB fetch
+        try (MongoClient mongo = MongoClients.create("mongodb://localhost:27017")) {
+            MongoDatabase database = mongo.getDatabase("dbLibraryMS");
+            MongoCollection<Document> collection = database.getCollection("Books");
+            collection.find().into(books);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } else {
+        // SQL fetch
+        try (Connection conn = SQLClientProvider.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Books");
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Document doc = new Document();
+                doc.put("_id", new Document("$oid", String.valueOf(rs.getInt("book_id"))));
+                doc.put("title", rs.getString("title"));
+                doc.put("author", rs.getString("author"));
+                doc.put("isbn", rs.getString("isbn"));
+                doc.put("category", rs.getString("category"));
+                doc.put("publisher", rs.getString("publisher"));
+                doc.put("publicationYear", rs.getInt("publicationYear"));
+                doc.put("quantity", rs.getInt("quantity"));
+                doc.put("available", rs.getInt("available"));
+                doc.put("description", rs.getString("description"));
+                books.add(doc);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 %>
 <!DOCTYPE html>
@@ -171,7 +199,6 @@
         </button>
     </div>
 
-    <!-- Books Table -->
     <div class="books-table-container">
         <table class="books-table">
             <thead>
@@ -188,33 +215,33 @@
             <tbody>
             <% if (books.isEmpty()) { %>
             <tr>
-                <td colspan="7" class="empty-state">
-                    <div class="empty-icon">🕮</div>
-                    <p>No books in the library yet. Click "Add New Book" to get started.</p>
-                </td>
+                <td colspan="7" class="empty-state">No books available</td>
             </tr>
             <% } else {
-                for (Document book : books) { %>
+                for (Document book : books) {
+
+                    String bookId;
+                    Object idObj = book.get("_id");
+
+                    if (idObj instanceof org.bson.types.ObjectId) {
+                        bookId = ((org.bson.types.ObjectId) idObj).toHexString();
+                    } else if (idObj instanceof Document) {
+                        bookId = ((Document) idObj).getString("$oid");
+                    } else {
+                        bookId = String.valueOf(idObj);
+                    }
+            %>
             <tr>
                 <td><strong><%= book.getString("title") %></strong></td>
                 <td><%= book.getString("author") %></td>
                 <td><%= book.getString("isbn") %></td>
-                <td><span class="category-badge"><%= book.getString("category") %></span></td>
+                <td><%= book.getString("category") %></td>
                 <td><%= book.getInteger("quantity", 0) %></td>
                 <td><%= book.getInteger("available", 0) %></td>
                 <td class="action-buttons">
-                    <button class="btn-edit" onclick='openEditModal(<%= book.toJson() %>)'>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                        Edit
-                    </button>
-                    <button class="btn-delete" onclick="deleteBook('<%= book.getObjectId("_id").toString() %>', '<%= book.getString("title") %>')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
+                    <button class="btn-edit" onclick='openEditModal(<%= book.toJson() %>)'>Edit</button>
+                    <button class="btn-delete"
+                            onclick="deleteBook('<%= bookId %>', '<%= book.getString("title") %>')">
                         Delete
                     </button>
                 </td>
