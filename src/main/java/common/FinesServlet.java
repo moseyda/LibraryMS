@@ -1,5 +1,6 @@
 package common;
 
+import admin.NotificationServlet;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -243,6 +244,14 @@ public class FinesServlet extends HttpServlet {
 
             fines.insertOne(fineRecord);
 
+            // --- Notification ---
+            String studentName = firstName + " " + lastName;
+            NotificationServlet.createNotification(
+                    "fine",
+                    "Fine Paid",
+                    studentName + " paid £" + totalAmount + " in fines"
+            );
+
             return new Document("success", true)
                     .append("receiptId", fineRecord.getObjectId("_id").toHexString())
                     .append("message", "Payment processed successfully").toJson();
@@ -311,6 +320,15 @@ public class FinesServlet extends HttpServlet {
                 result.put("success", true);
                 result.put("receiptId", receiptId);
                 result.put("message", "Payment processed successfully");
+
+                // --- Notification code ---
+                String studentName = firstName + " " + lastName;
+                NotificationServlet.createNotification(
+                        "fine",
+                        "Fine Paid",
+                        studentName + " paid £" + totalAmount + " in fines"
+                );
+
                 return result.toString();
             }
         }

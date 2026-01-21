@@ -1,5 +1,6 @@
 package student;
 
+import admin.NotificationServlet;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -114,8 +115,11 @@ public class BorrowBook extends HttpServlet {
                     new Document("isbn", isbn),
                     new Document("$inc", new Document("available", -1))
             );
+            NotificationServlet.createNotification("borrow", "Book Borrowed",
+                    "Student " + studentNumber + " borrowed \"" + title + "\"");
 
             return "{\"success\":true,\"message\":\"Book borrowed successfully\"}";
+
         }
     }
 
@@ -149,18 +153,20 @@ public class BorrowBook extends HttpServlet {
                 LocalDate expectedReturnDate = borrowDate.plusDays(1);
 
                 // Insert borrow record
-                String insertSql = "INSERT INTO BorrowReturnHist (book_id, SNumber, firstName, lastName, " +
-                        "borrowDate, expectedReturnDate, actualReturnDate, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                String insertSql = "INSERT INTO BorrowReturnHist (book_id, title, isbn, SNumber, firstName, lastName, " +
+                        "borrowDate, expectedReturnDate, actualReturnDate, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 try (PreparedStatement stmt = conn.prepareStatement(insertSql)) {
                     stmt.setInt(1, bookId);
-                    stmt.setString(2, studentNumber);
-                    stmt.setString(3, firstName);
-                    stmt.setString(4, lastName);
-                    stmt.setDate(5, java.sql.Date.valueOf(borrowDate));
-                    stmt.setDate(6, java.sql.Date.valueOf(expectedReturnDate));
-                    stmt.setNull(7, Types.DATE);
-                    stmt.setString(8, "borrowed");
+                    stmt.setString(2, title);
+                    stmt.setString(3, isbn);
+                    stmt.setString(4, studentNumber);
+                    stmt.setString(5, firstName);
+                    stmt.setString(6, lastName);
+                    stmt.setDate(7, java.sql.Date.valueOf(borrowDate));
+                    stmt.setDate(8, java.sql.Date.valueOf(expectedReturnDate));
+                    stmt.setNull(9, Types.DATE);
+                    stmt.setString(10, "borrowed");
                     stmt.executeUpdate();
                 }
 
@@ -172,6 +178,13 @@ public class BorrowBook extends HttpServlet {
                 }
 
                 conn.commit();
+
+                NotificationServlet.createNotification(
+                        "borrow",
+                        "Book Borrowed",
+                        "Student " + studentNumber + " borrowed \"" + title + "\""
+                );
+
                 return "{\"success\":true,\"message\":\"Book borrowed successfully\"}";
 
             } catch (SQLException e) {

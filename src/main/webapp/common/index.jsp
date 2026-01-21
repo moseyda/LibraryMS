@@ -46,7 +46,7 @@
             </p>
             <div class="hero-actions">
                 <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp" class="btn btn-primary">
-                    Start Free Trial
+                    Get Started
                     <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
                     </svg>
@@ -80,7 +80,7 @@
                     <div class="card-icon">📚</div>
                     <div class="card-text">
                         <div class="card-title">Digital Catalog</div>
-                        <div class="card-subtitle">50,000+ Books</div>
+                        <div class="card-subtitle">Wide Range Books</div>
                     </div>
                 </div>
                 <div class="floating-card card-2">
@@ -114,7 +114,7 @@
                 </div>
                 <div class="feature-content">
                     <h3 class="feature-title">Smart Registration</h3>
-                    <p class="feature-description">Streamlined onboarding process with instant verification and automated member card generation.</p>
+                    <p class="feature-description">Streamlined onboarding process with instant verification.</p>
                     <div class="feature-link">
                         Learn more
                         <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -133,7 +133,7 @@
                 </div>
                 <div class="feature-content">
                     <h3 class="feature-title">Book Management</h3>
-                    <p class="feature-description">Advanced cataloging system with ISBN scanning, automated categorization, and inventory tracking.</p>
+                    <p class="feature-description">Advanced search bar for quick look up.</p>
                     <div class="feature-link">
                         Learn more
                         <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -152,7 +152,7 @@
                 </div>
                 <div class="feature-content">
                     <h3 class="feature-title">Smart Borrowing</h3>
-                    <p class="feature-description">QR code-based checkout with automatic due dates, renewal options, and overdue notifications.</p>
+                    <p class="feature-description">Fast borrowing with automatic due dates, extension options, and overdue notifications.</p>
                     <div class="feature-link">
                         Learn more
                         <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -170,8 +170,8 @@
                     </div>
                 </div>
                 <div class="feature-content">
-                    <h3 class="feature-title">AI-Powered Search</h3>
-                    <p class="feature-description">Lightning-fast search with intelligent recommendations and natural language processing.</p>
+                    <h3 class="feature-title">Advanced Admin Control</h3>
+                    <p class="feature-description">Active admins with continuous monitoring capabilites.</p>
                     <div class="feature-link">
                         Learn more
                         <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -190,7 +190,7 @@
                 </div>
                 <div class="feature-content">
                     <h3 class="feature-title">Analytics Dashboard</h3>
-                    <p class="feature-description">Real-time insights with interactive charts, usage patterns, and predictive analytics.</p>
+                    <p class="feature-description">Real-time insights with interactive charts, KPI cards and much more in one Admin dashboard.</p>
                     <div class="feature-link">
                         Learn more
                         <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -209,7 +209,7 @@
                 </div>
                 <div class="feature-content">
                     <h3 class="feature-title">Digital Library</h3>
-                    <p class="feature-description">Access thousands of e-books and audiobooks from any device, anywhere, anytime.</p>
+                    <p class="feature-description">Access to 100s of books brought to your hands.</p>
                     <div class="feature-link">
                         Learn more
                         <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
@@ -285,7 +285,7 @@
             <!-- Info Card -->
             <div class="contact-card" style="background:#f8fafc;border:2px solid #e5e7eb;border-radius:20px;padding:2rem;display:flex;flex-direction:column;gap:1.25rem;">
                 <h3 style="margin:0;font-size:1.5rem;font-weight:700;color:#1a1a1a;">Support Channels</h3>
-                <p style="color:#64748b;line-height:1.6;">Reach us by email or send a quick message with the form. We typically respond within 1 business day.</p>
+                <p style="color:#64748b;line-height:1.6;">Send us a quick message with the form. We typically respond within 1 business day. **You have to be a registered member to be able to message us.</p>
                 <div style="display:flex;flex-direction:column;gap:0.75rem;font-size:0.95rem;">
                     <div style="display:flex;align-items:center;gap:0.75rem;">
                         <span style="width:40px;height:40px;border-radius:12px;background:#6366f1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:default;user-select:none;">@</span>
@@ -316,7 +316,7 @@
                   style="background:#ffffff;border:2px solid #e5e7eb;border-radius:20px;padding:2rem;display:flex;flex-direction:column;gap:1rem;">
 
                 <h3 style="margin:0 0 0.25rem;font-size:1.5rem;font-weight:700;color:#1a1a1a;">Send a Message</h3>
-                <p style="color:#64748b;font-size:0.95rem;margin:0 0 1rem;">Fill in the details below and we will reply via email.</p>
+                <p style="color:#64748b;font-size:0.95rem;margin:0 0 1rem;">Fill in the details below and we will leve a response on your profile.</p>
 
                 <div style="display:flex;flex-direction:column;gap:0.5rem;">
                     <label for="contactName" style="font-weight:600;font-size:0.85rem;color:#1a1a1a;">Name *</label>
@@ -358,12 +358,12 @@
 <section class="cta-section">
     <div class="cta-container">
         <div class="cta-content">
-            <h2 class="cta-title">Ready to modernize your library?</h2>
-            <p class="cta-description">Join thousands of libraries worldwide using our platform</p>
+            <h2 class="cta-title">Ready to modernise your library?</h2>
+            <p class="cta-description">Join hundreds of clients worldwide using our platform</p>
         </div>
         <div class="cta-actions">
             <a href="../student/registration.jsp" class="btn btn-white">Get Started Free</a>
-            <a href="#contact" class="btn btn-outline">Contact Sales</a>
+            <a href="#contact" class="btn btn-outline">Contact Us</a>
         </div>
     </div>
 </section>
@@ -393,7 +393,9 @@
                 Admin Portal
             </a>
         </div>
-        <p class="footer-copyright">© 2025 LibraryMS. Built with Jakarta EE & MongoDB. All rights reserved.</p>
+        <p class="footer-copyright">
+            © <script>document.write(new Date().getFullYear());</script> LibraryMS. All rights reserved.
+        </p>
     </div>
 </footer>
 

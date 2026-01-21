@@ -4,7 +4,7 @@ package configs;// THIS IS THE CONFIGURATION FILE TO SWITCH BETWEEN DATABASE BAC
 
 public class DatabaseConfig {
     // Change this to switch backends
-    public static final String DB_TYPE = "sql"; // or "sql"
+    public static final String DB_TYPE = "mongodb"; // "mongodb" or "sql"
 
     public static boolean isMongoDB() {
         return "mongodb".equalsIgnoreCase(DB_TYPE);

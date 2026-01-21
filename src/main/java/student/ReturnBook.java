@@ -1,5 +1,6 @@
 package student;
 
+import admin.NotificationServlet;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -68,6 +69,7 @@ public class ReturnBook extends HttpServlet {
         }
     }
 
+    // -------------------- MongoDB --------------------
     private Object[] returnBookMongoDB(String borrowId) {
         try (MongoClient client = MongoClients.create(MONGO_URI)) {
             MongoDatabase db = client.getDatabase(DB_NAME);
@@ -80,6 +82,8 @@ public class ReturnBook extends HttpServlet {
             }
 
             String isbn = borrowRecord.getString("isbn");
+            String SNumber = borrowRecord.getString("SNumber");
+            String title = borrowRecord.getString("title");
 
             Date actualReturnDate = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
 
@@ -95,13 +99,23 @@ public class ReturnBook extends HttpServlet {
                     new Document("$inc", new Document("available", 1))
             );
 
+            NotificationServlet.createNotification(
+                    "return",
+                    "Book Returned",
+                    "Student " + SNumber + " returned \"" + title + "\""
+            );
+
             return new Object[]{true, null};
         } catch (Exception e) {
             return new Object[]{false, e.getMessage()};
         }
     }
 
+    // -------------------- SQL --------------------
     private Object[] returnBookSQL(String borrowId) {
+        String SNumber = null;
+        String title = null;
+
         if (borrowId == null || borrowId.trim().isEmpty()) {
             return new Object[]{false, "Missing borrowId"};
         }
@@ -118,28 +132,27 @@ public class ReturnBook extends HttpServlet {
             try {
                 conn.setAutoCommit(false);
 
-                // select book_id using actual PK column `record_id`
-                String selectSql = "SELECT book_id FROM BorrowReturnHist WHERE record_id = ?";
+                // --- SELECT record ---
+                String selectSql = "SELECT book_id, SNumber, title FROM BorrowReturnHist WHERE record_id = ?";
                 Integer bookId = null;
                 try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
                     if (isNumeric) selectStmt.setInt(1, numericId);
                     else selectStmt.setString(1, borrowId);
+
                     try (ResultSet rs = selectStmt.executeQuery()) {
                         if (!rs.next()) {
                             conn.rollback();
                             return new Object[]{false, "Borrow record not found"};
                         }
                         bookId = rs.getInt("book_id");
-                        if (rs.wasNull()) {
-                            conn.rollback();
-                            return new Object[]{false, "Borrow record missing book_id"};
-                        }
+                        SNumber = rs.getString("SNumber");
+                        title = rs.getString("title");
                     }
                 }
 
-                java.sql.Timestamp actualReturnDate = Timestamp.valueOf(LocalDateTime.now());
+                Timestamp actualReturnDate = Timestamp.valueOf(LocalDateTime.now());
 
-                // update borrow record using record_id
+                // --- UPDATE borrow record ---
                 String updateHistSql = "UPDATE BorrowReturnHist SET status = 'returned', actualReturnDate = ? WHERE record_id = ?";
                 int histUpdated;
                 try (PreparedStatement updateHistStmt = conn.prepareStatement(updateHistSql)) {
@@ -154,7 +167,7 @@ public class ReturnBook extends HttpServlet {
                     return new Object[]{false, "Borrow record not updated"};
                 }
 
-                // increment available
+                // --- UPDATE book availability ---
                 String updateBookSql = "UPDATE Books SET available = available + 1 WHERE book_id = ?";
                 int bookUpdated;
                 try (PreparedStatement updateBookStmt = conn.prepareStatement(updateBookSql)) {
@@ -168,18 +181,22 @@ public class ReturnBook extends HttpServlet {
                 }
 
                 conn.commit();
+
+                // --- CREATE notification ---
+                NotificationServlet.createNotification(
+                        "return",
+                        "Book Returned",
+                        "Student " + SNumber + " returned \"" + title + "\""
+                );
+
                 return new Object[]{true, null};
             } catch (SQLException e) {
                 try {
                     conn.rollback();
-                } catch (SQLException ignore) {
-                }
+                } catch (SQLException ignore) {}
                 return new Object[]{false, e.getMessage()};
             } finally {
-                try {
-                    conn.setAutoCommit(true);
-                } catch (SQLException ignore) {
-                }
+                try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
             }
         } catch (SQLException ex) {
             return new Object[]{false, ex.getMessage()};

@@ -51,4 +51,15 @@
   "LName": "Edward",
   "SNumber": "1324354",
   "Password": "Edwards"
+},
+
+{
+  "//note": "This entry is for testing password hashing. The password in plain is 'Iamatest' if login is required.",
+  "_id": {
+    "$oid": "696fda7d030ecbd2e4530126"
+  },
+  "FName": "HashTest",
+  "LName": "PassHash",
+  "SNumber": "0000000",
+  "Password": "$2a$10$uVDs9RDiW5HrZxu7094s2ukDfpHG5NrcmYwYl4ahZBKM.tfQVVL92"
 }]

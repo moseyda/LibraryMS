@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS Students (
 
 CREATE TABLE IF NOT EXISTS BorrowReturnHist (
     record_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    isbn VARCHAR(20) NOT NULL,
     SNumber VARCHAR(50) NOT NULL,
     book_id INT NOT NULL,
     firstName VARCHAR(100),
@@ -38,6 +40,7 @@ CREATE TABLE IF NOT EXISTS BorrowReturnHist (
     FOREIGN KEY (SNumber) REFERENCES Students(SNumber),
     FOREIGN KEY (book_id) REFERENCES Books(book_id)
     );
+
 
 CREATE TABLE IF NOT EXISTS Fines (
     fine_id INT AUTO_INCREMENT PRIMARY KEY,

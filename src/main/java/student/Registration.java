@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 @WebServlet(name = "Registration", value = "/registration")
 public class Registration extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -26,11 +28,20 @@ public class Registration extends HttpServlet {
         String snumber = request.getParameter("snumber");
         String password = request.getParameter("password");
 
+        if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            response.sendRedirect(request.getContextPath() +
+                    "/student/registration.jsp?error=weak_password");
+            return;
+        }
+
+        // HASH PASSWORD
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
         boolean ok;
         if (DatabaseConfig.isMongoDB()) {
-            ok = createCustomerMongoDB(fname, lname, snumber, password);
+            ok = createCustomerMongoDB(fname, lname, snumber, hashedPassword);
         } else {
-            ok = createCustomerSQL(fname, lname, snumber, password);
+            ok = createCustomerSQL(fname, lname, snumber, hashedPassword);
         }
 
         if (ok) {

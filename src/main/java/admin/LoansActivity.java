@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@WebServlet(name = "admin.LoansActivity", value = "/admin/loansActivity")
+@WebServlet(name = "admin.LoansActivity", urlPatterns = {"/admin/loansActivity", "/admin/studentHistory"})
 public class LoansActivity extends HttpServlet {
 
     private static final String MONGO_URI = "mongodb://localhost:27017";
@@ -36,14 +36,19 @@ public class LoansActivity extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
 
-        String statusFilter = request.getParameter("status");
+        String path = request.getServletPath();
 
         try (PrintWriter out = response.getWriter()) {
             String json;
-            if (DatabaseConfig.isMongoDB()) {
-                json = getLoansActivityMongoDB(statusFilter);
+            if (path.endsWith("/studentHistory")) {
+                json = handleStudentHistory(request);
             } else {
-                json = getLoansActivitySQL(statusFilter);
+                String statusFilter = request.getParameter("status");
+                if (DatabaseConfig.isMongoDB()) {
+                    json = getLoansActivityMongoDB(statusFilter);
+                } else {
+                    json = getLoansActivitySQL(statusFilter);
+                }
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
@@ -58,7 +63,127 @@ public class LoansActivity extends HttpServlet {
         }
     }
 
-    // MongoDB implementation
+    // Student-focused History handler
+    private String handleStudentHistory(HttpServletRequest request) throws Exception {
+        String studentNumber = request.getParameter("studentNumber");
+        String month = request.getParameter("month");
+
+        if (studentNumber == null || studentNumber.isBlank()) {
+            return "{\"success\":false,\"error\":\"Student number required\"}";
+        }
+
+        if (DatabaseConfig.isMongoDB()) {
+            return getStudentHistoryMongoDB(studentNumber, month);
+        } else {
+            return getStudentHistorySQL(studentNumber, month);
+        }
+    }
+
+    private String getStudentHistorySQL(String studentNumber, String month) throws Exception {
+        StringBuilder sql = new StringBuilder(
+                "SELECT record_id, SNumber, isbn, title, firstName, lastName, book_id, " +
+                        "borrowDate, expectedReturnDate, actualReturnDate, status " +
+                        "FROM BorrowReturnHist WHERE SNumber = ?");
+
+        if (month != null && !month.isBlank()) {
+            sql.append(" AND DATE_FORMAT(borrowDate, '%Y-%m') = ?");
+        }
+        sql.append(" ORDER BY borrowDate DESC");
+
+        try (Connection conn = SQLClientProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            ps.setString(1, studentNumber);
+            if (month != null && !month.isBlank()) {
+                ps.setString(2, month);
+            }
+
+            JSONArray records = new JSONArray();
+            JSONObject studentInfo = new JSONObject();
+            Date now = new Date();
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    if (studentInfo.isEmpty()) {
+                        studentInfo.put("firstName", rs.getString("firstName"));
+                        studentInfo.put("lastName", rs.getString("lastName"));
+                        studentInfo.put("studentNumber", studentNumber);
+                    }
+
+                    Timestamp expectedReturn = rs.getTimestamp("expectedReturnDate");
+                    Timestamp actualReturn = rs.getTimestamp("actualReturnDate");
+                    String computedStatus = computeStatusSQL(expectedReturn, actualReturn, rs.getString("status"), now);
+
+                    JSONObject rec = new JSONObject();
+                    rec.put("recordId", rs.getInt("record_id"));
+                    rec.put("title", rs.getString("title"));
+                    rec.put("isbn", rs.getString("isbn"));
+                    rec.put("borrowDate", rs.getTimestamp("borrowDate") != null ? rs.getTimestamp("borrowDate").getTime() : JSONObject.NULL);
+                    rec.put("expectedReturnDate", expectedReturn != null ? expectedReturn.getTime() : JSONObject.NULL);
+                    rec.put("actualReturnDate", actualReturn != null ? actualReturn.getTime() : JSONObject.NULL);
+                    rec.put("status", computedStatus);
+                    records.put(rec);
+                }
+            }
+
+            JSONObject result = new JSONObject();
+            result.put("success", true);
+            result.put("student", studentInfo);
+            result.put("records", records);
+            return result.toString();
+        }
+    }
+
+    private String getStudentHistoryMongoDB(String studentNumber, String month) {
+        try (MongoClient client = MongoClients.create(MONGO_URI)) {
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> col = db.getCollection("BorrowReturnHist");
+
+            Document query = new Document("SNumber", studentNumber);
+            List<Document> records = new ArrayList<>();
+            col.find(query).sort(new Document("borrowDate", -1)).into(records);
+
+            Date now = new Date();
+            JSONArray arr = new JSONArray();
+            JSONObject studentInfo = new JSONObject();
+
+            for (Document doc : records) {
+                Date borrowDate = doc.getDate("borrowDate");
+                if (month != null && !month.isBlank() && borrowDate != null) {
+                    String docMonth = String.format("%tY-%tm", borrowDate, borrowDate);
+                    if (!docMonth.equals(month)) continue;
+                }
+
+                if (studentInfo.isEmpty()) {
+                    studentInfo.put("firstName", doc.getString("firstName"));
+                    studentInfo.put("lastName", doc.getString("lastName"));
+                    studentInfo.put("studentNumber", studentNumber);
+                }
+
+                String computedStatus = computeStatusMongo(doc, now);
+                JSONObject rec = new JSONObject();
+                rec.put("recordId", doc.getObjectId("_id").toHexString());
+                rec.put("title", doc.getString("title"));
+                rec.put("isbn", doc.getString("isbn"));
+                rec.put("borrowDate", borrowDate != null ? borrowDate.getTime() : JSONObject.NULL);
+                Date expected = doc.getDate("expectedReturnDate");
+                Date actual = doc.getDate("actualReturnDate");
+                rec.put("expectedReturnDate", expected != null ? expected.getTime() : JSONObject.NULL);
+                rec.put("actualReturnDate", actual != null ? actual.getTime() : JSONObject.NULL);
+                rec.put("status", computedStatus);
+                arr.put(rec);
+            }
+
+            JSONObject result = new JSONObject();
+            result.put("success", true);
+            result.put("student", studentInfo);
+            result.put("records", arr);
+            return result.toString();
+        }
+    }
+
+ // General Loans Activity handler
+
     private String getLoansActivityMongoDB(String statusFilter) {
         try (MongoClient client = MongoClients.create(MONGO_URI)) {
             MongoDatabase db = client.getDatabase(DB_NAME);
@@ -88,7 +213,6 @@ public class LoansActivity extends HttpServlet {
         }
     }
 
-    // SQL implementation
     private String getLoansActivitySQL(String statusFilter) throws Exception {
         String sql = "SELECT * FROM BorrowReturnHist ORDER BY borrowDate DESC";
 
@@ -100,10 +224,9 @@ public class LoansActivity extends HttpServlet {
             Date now = new Date();
 
             while (rs.next()) {
-                java.sql.Timestamp expectedReturn = rs.getTimestamp("expectedReturnDate");
-                java.sql.Timestamp actualReturn = rs.getTimestamp("actualReturnDate");
+                Timestamp expectedReturn = rs.getTimestamp("expectedReturnDate");
+                Timestamp actualReturn = rs.getTimestamp("actualReturnDate");
                 String dbStatus = rs.getString("status");
-
                 String computedStatus = computeStatusSQL(expectedReturn, actualReturn, dbStatus, now);
 
                 if (statusFilter != null && !statusFilter.isBlank()

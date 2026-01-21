@@ -1,3 +1,10 @@
+<%
+    if ("weak_password".equals(request.getParameter("error"))) {
+%>
+<div class="error-message">
+    Password must be at least 8 characters and include uppercase, lowercase, and a number.
+</div>
+<% } %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -141,9 +148,16 @@
                             name="password"
                             class="form-input"
                             placeholder="Create a secure password"
-                            minlength="6"
+                            minlength="8"
                             required
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+                            title="Password must be at least 8 characters and include uppercase, lowercase, and a number"
                     >
+
+                    <small id="passwordHint" style="color:#ef4444; display:none;">
+                        Password must be 8+ chars with uppercase, lowercase, and a number.
+                    </small>
+
                 </div>
             </div>
 
@@ -182,6 +196,17 @@
             this.style.borderColor = '#6366f1';
         });
     });
+
+
+        const pwd = document.getElementById('password');
+        const hint = document.getElementById('passwordHint');
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+        pwd.addEventListener('input', () => {
+        hint.style.display = regex.test(pwd.value) ? 'none' : 'block';
+    });
+
+
 </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package student;
 
+import admin.NotificationServlet;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -15,10 +16,7 @@ import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -70,56 +68,146 @@ public class ExtendBorrow extends HttpServlet {
             MongoDatabase db = client.getDatabase(DB_NAME);
             MongoCollection<Document> histCol = db.getCollection("BorrowReturnHist");
 
-            Document borrowRecord = histCol.find(new Document("_id", new ObjectId(borrowId))).first();
+            Document borrowRecord = histCol.find(
+                    new Document("_id", new ObjectId(borrowId))
+                            .append("status", "borrowed")
+            ).first();
+
             if (borrowRecord == null) {
-                return new Object[]{false, "Borrow record not found"};
+                return new Object[]{false, "Borrow record not found or already returned"};
             }
 
             Date currentExpectedReturnDate = borrowRecord.getDate("expectedReturnDate");
-            LocalDate newExpectedReturnDate = Instant.ofEpochMilli(currentExpectedReturnDate.getTime())
-                    .atZone(ZoneId.systemDefault())
+            String SNumber = borrowRecord.getString("SNumber");
+            String title = borrowRecord.getString("title");
+
+            LocalDate newExpectedReturnDate = Instant.ofEpochMilli(
+                            currentExpectedReturnDate.getTime()
+                    ).atZone(ZoneId.systemDefault())
                     .toLocalDate()
                     .plusDays(1);
 
             histCol.updateOne(
                     new Document("_id", new ObjectId(borrowId)),
-                    new Document("$set", new Document("expectedReturnDate",
-                            Date.from(newExpectedReturnDate.atStartOfDay(ZoneId.systemDefault()).toInstant())))
+                    new Document("$set", new Document(
+                            "expectedReturnDate",
+                            Date.from(
+                                    newExpectedReturnDate
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()
+                            )
+                    ))
+            );
+            // --- CREATE notification ---
+            NotificationServlet.createNotification(
+                    "extend",
+                    "Borrow Extended",
+                    "Student " + SNumber + " extended \"" + title + "\" by 1 day"
             );
 
             return new Object[]{true, null};
+
         } catch (Exception e) {
             return new Object[]{false, e.getMessage()};
         }
     }
 
-    private Object[] extendBorrowSQL(String borrowId) throws SQLException {
+
+    private Object[] extendBorrowSQL(String borrowId) {
+        if (borrowId == null || borrowId.trim().isEmpty()) {
+            return new Object[]{false, "Missing borrowId"};
+        }
+
+        boolean isNumeric = true;
+        int numericId = -1;
+        try {
+            numericId = Integer.parseInt(borrowId);
+        } catch (NumberFormatException ignored) {
+            isNumeric = false;
+        }
+
         try (Connection conn = SQLClientProvider.getConnection()) {
-            // Get current expected return date
-            String selectSql = "SELECT expectedReturnDate FROM BorrowReturnHist WHERE id = ?";
-            java.sql.Date currentExpectedReturnDate;
+            try {
+                conn.setAutoCommit(false);
 
-            try (PreparedStatement stmt = conn.prepareStatement(selectSql)) {
-                stmt.setInt(1, Integer.parseInt(borrowId));
-                ResultSet rs = stmt.executeQuery();
-                if (!rs.next()) {
-                    return new Object[]{false, "Borrow record not found"};
+                String selectSql =
+                        "SELECT expectedReturnDate, SNumber, title " +
+                                "FROM BorrowReturnHist " +
+                                "WHERE record_id = ? AND status = 'borrowed'";
+
+                Timestamp currentExpectedReturnDate;
+                String SNumber;
+                String title;
+
+
+                try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                    if (isNumeric) selectStmt.setInt(1, numericId);
+                    else selectStmt.setString(1, borrowId);
+
+                    try (ResultSet rs = selectStmt.executeQuery()) {
+                        if (!rs.next()) {
+                            conn.rollback();
+                            return new Object[]{false, "Borrow record not found or already returned"};
+                        }
+                        currentExpectedReturnDate = rs.getTimestamp("expectedReturnDate");
+                        SNumber = rs.getString("SNumber");
+                        title = rs.getString("title");
+                        ;
+                    }
                 }
-                currentExpectedReturnDate = rs.getDate("expectedReturnDate");
+
+                // --- Calculate new expectedReturnDate (+1 day) ---
+                Timestamp newExpectedReturnDate =
+                        Timestamp.valueOf(
+                                currentExpectedReturnDate
+                                        .toLocalDateTime()
+                                        .plusDays(1)
+                        );
+
+                // --- UPDATE record ---
+                String updateSql =
+                        "UPDATE BorrowReturnHist " +
+                                "SET expectedReturnDate = ? " +
+                                "WHERE record_id = ?";
+
+                int updated;
+                try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                    updateStmt.setTimestamp(1, newExpectedReturnDate);
+                    if (isNumeric) updateStmt.setInt(2, numericId);
+                    else updateStmt.setString(2, borrowId);
+                    updated = updateStmt.executeUpdate();
+                }
+
+                if (updated == 0) {
+                    conn.rollback();
+                    return new Object[]{false, "Failed to update borrow record"};
+                }
+
+                conn.commit();
+                NotificationServlet.createNotification(
+                        "extend",
+                        "Borrow Extended",
+                        "Student " + SNumber + " extended \"" + title + "\" by 1 day"
+                );
+
+
+                return new Object[]{true, null};
+
+            } catch (SQLException e) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ignore) {
+                }
+                return new Object[]{false, e.getMessage()};
+            } finally {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException ignore) {
+                }
             }
-
-            // Calculate new expected return date (+1 day)
-            LocalDate newExpectedReturnDate = currentExpectedReturnDate.toLocalDate().plusDays(1);
-
-            // Update the record
-            String updateSql = "UPDATE BorrowReturnHist SET expectedReturnDate = ? WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
-                stmt.setDate(1, java.sql.Date.valueOf(newExpectedReturnDate));
-                stmt.setInt(2, Integer.parseInt(borrowId));
-                stmt.executeUpdate();
-            }
-
-            return new Object[]{true, null};
+        } catch (SQLException e) {
+            return new Object[]{false, e.getMessage()};
         }
     }
 }
+

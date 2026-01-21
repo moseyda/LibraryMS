@@ -109,11 +109,6 @@
                 <h3>Account History</h3>
                 <p>View borrow history</p>
             </a>
-            <a href="#" class="action-card">
-                <div class="action-icon">👤</div>
-                <h3>My Profile</h3>
-                <p>Manage your account</p>
-            </a>
             <a href="#" class="action-card" onclick="openFinesModal()">
                 <div class="action-icon">💳</div>
                 <h3>Pay Fines</h3>

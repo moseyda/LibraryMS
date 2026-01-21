@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <span class="book-status borrowed">Borrowed</span>
                                     <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
                                         <button class="return-btn" onclick="returnBook('${book._id?.$oid || book._id}')">Return</button>
-                                        <button class="extend-btn" onclick="extendBorrow('${book._id?.$oid || book._id}')">Extend</button>
+                                        <button type="button" class="extend-btn" onclick="extendBorrow('${book._id?.$oid || book._id}')">Extend</button>
                                     </div>
                                 </div>
                             `).join('')
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
 
             if (response.ok) {
-                showToast('Borrow period extended by 10 days!', 'success');
+                showToast('Borrow period extended by 1 day!', 'success');
                 document.getElementById('myBooksModal').remove();
             } else {
                 showToast(result.error || 'Failed to extend borrow period', 'error');
@@ -1392,3 +1392,334 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+// admin dashboard student-specific history modal and table
+function openStudentHistoryModal() {
+    const modalHTML = `
+    <div id="studentHistoryModal" class="modal" style="display:flex;">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-header">
+                <h2>🔍 Student Loan History</h2>
+                <span class="close-modal" onclick="document.getElementById('studentHistoryModal').remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <input id="histStudentNum" type="text" placeholder="Student Number" 
+                           style="flex:1;min-width:180px;padding:0.5rem;border:2px solid #e5e7eb;border-radius:8px;">
+                    <input id="histMonth" type="month" 
+                           style="padding:0.5rem;border:2px solid #e5e7eb;border-radius:8px;">
+                    <button onclick="searchStudentHistory()" 
+                            style="padding:0.5rem 1rem;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer;">
+                        Search
+                    </button>
+                </div>
+                <div id="studentInfoBar" style="display:none;padding:1rem;background:#f8fafc;border-radius:8px;margin-bottom:1rem;"></div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead style="background:#f8fafc;border-bottom:2px solid #e5e7eb;">
+                            <tr>
+                                <th style="padding:0.75rem;text-align:left;">Title</th>
+                                <th style="padding:0.75rem;text-align:left;">ISBN</th>
+                                <th style="padding:0.75rem;text-align:left;">Borrowed</th>
+                                <th style="padding:0.75rem;text-align:left;">Expected Return</th>
+                                <th style="padding:0.75rem;text-align:left;">Returned</th>
+                                <th style="padding:0.75rem;text-align:left;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentHistoryBody">
+                            <tr><td colspan="6" style="padding:1rem;color:#64748b;text-align:center;">Enter student number to search</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+async function searchStudentHistory() {
+    const studentNum = document.getElementById('histStudentNum').value.trim();
+    const month = document.getElementById('histMonth').value;
+    const tbody = document.getElementById('studentHistoryBody');
+    const infoBar = document.getElementById('studentInfoBar');
+
+    if (!studentNum) {
+        showToast('Please enter a student number', 'error');
+        return;
+    }
+
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:1rem;text-align:center;">Loading...</td></tr>';
+
+    try {
+        const url = `${window.APP_CTX}/admin/studentHistory?studentNumber=${encodeURIComponent(studentNum)}${month ? `&month=${month}` : ''}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:1rem;color:#ef4444;">${data.error}</td></tr>`;
+            infoBar.style.display = 'none';
+            return;
+        }
+
+        if (data.student && data.student.firstName) {
+            infoBar.innerHTML = `<strong>${data.student.firstName} ${data.student.lastName}</strong> (${data.student.studentNumber})`;
+            infoBar.style.display = 'block';
+        } else {
+            infoBar.style.display = 'none';
+        }
+
+        if (!data.records || data.records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding:1rem;color:#64748b;text-align:center;">No records found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = data.records.map(r => {
+            const status = (r.status || 'borrowed').toLowerCase();
+            const cssClass = status === 'overdue' ? 'overdue' : status === 'returned' ? 'returned' : 'borrowed';
+            return `
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                    <td style="padding:0.75rem;">${escapeHtml(r.title)}</td>
+                    <td style="padding:0.75rem;">${escapeHtml(r.isbn)}</td>
+                    <td style="padding:0.75rem;">${formatDateTime(r.borrowDate)}</td>
+                    <td style="padding:0.75rem;">${formatDateTime(r.expectedReturnDate)}</td>
+                    <td style="padding:0.75rem;">${r.actualReturnDate ? formatDateTime(r.actualReturnDate) : '-'}</td>
+                    <td style="padding:0.75rem;"><span class="book-status ${cssClass}">${status}</span></td>
+                </tr>`;
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:1rem;color:#ef4444;">Error loading history</td></tr>';
+    }
+}
+
+// ==========================================
+// ADMIN NOTIFICATIONS SYSTEM
+// ==========================================
+
+
+let notifications = [];
+let notificationPollingInterval = null;
+
+// ------------------------------------------
+// PANEL TOGGLE
+// ------------------------------------------
+
+function toggleNotificationPanel() {
+    const panel = document.getElementById('notificationPanel');
+    if (!panel) return;
+
+    panel.classList.toggle('active');
+    if (panel.classList.contains('active')) {
+        loadNotifications(true);
+    }
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', (e) => {
+    const wrapper = document.querySelector('.notification-wrapper');
+    const panel = document.getElementById('notificationPanel');
+    if (wrapper && panel && !wrapper.contains(e.target)) {
+        panel.classList.remove('active');
+    }
+});
+
+// ------------------------------------------
+// LOAD NOTIFICATIONS
+// ------------------------------------------
+
+async function loadNotifications(force = false) {
+    try {
+        const response = await fetch(`${window.APP_CTX}/admin/getNotifications`, {
+            cache: force ? 'no-store' : 'default'
+        });
+
+        if (!response.ok) throw new Error(response.status);
+
+        const data = await response.json();
+        if (!data.success) return;
+
+        notifications = data.notifications || [];
+        renderNotifications();
+        updateBadge();
+
+    } catch (err) {
+        console.error('Notification load failed:', err);
+    }
+}
+
+// ------------------------------------------
+// RENDER NOTIFICATIONS
+// ------------------------------------------
+
+function renderNotifications() {
+    const list = document.getElementById('notificationList');
+    if (!list) return;
+
+    if (!notifications.length) {
+        list.innerHTML = '<div class="notification-empty">No notifications</div>';
+        return;
+    }
+
+    list.innerHTML = notifications.map(n => `
+        <div class="notification-item ${n.read ? '' : 'unread'}"
+             onclick="markAsRead(event, '${String(n.id)}')">
+            <div class="notification-icon">${getNotificationIcon(n.type)}</div>
+            <div class="notification-content">
+                <div class="notification-title">${escapeHtml(n.title)}</div>
+                <div class="notification-text">${escapeHtml(n.message)}</div>
+                <div class="notification-time">${formatTimeAgo(n.timestamp)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ------------------------------------------
+// ICONS
+// ------------------------------------------
+
+function getNotificationIcon(type) {
+    const icons = {
+        borrow: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+        return: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        overdue: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        fine: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
+        message: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'
+    };
+    return icons[type] || icons.message;
+}
+
+// ------------------------------------------
+// MARK SINGLE NOTIFICATION AS READ
+// ------------------------------------------
+
+async function markAsRead(event, notificationId) {
+    event.stopPropagation(); // CRITICAL FIX
+
+    const n = notifications.find(x => String(x.id) === String(notificationId));
+    if (!n || n.read) return;
+
+    // Optimistic UI update
+    n.read = true;
+    renderNotifications();
+    updateBadge();
+
+    try {
+        const res = await fetch(`${window.APP_CTX}/admin/markNotificationRead`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${encodeURIComponent(notificationId)}`
+        });
+
+        if (!res.ok) throw new Error();
+
+        // Force authoritative refresh
+        loadNotifications(true);
+
+    } catch (err) {
+        console.error('Mark read failed:', err);
+    }
+}
+
+// ------------------------------------------
+// MARK ALL AS READ
+// ------------------------------------------
+
+async function markAllAsRead() {
+    notifications.forEach(n => n.read = true);
+    renderNotifications();
+    updateBadge();
+
+    try {
+        const res = await fetch(`${window.APP_CTX}/admin/markAllNotificationsRead`, {
+            method: 'POST'
+        });
+
+        if (!res.ok) throw new Error();
+
+        loadNotifications(true);
+
+    } catch (err) {
+        console.error('Mark all failed:', err);
+    }
+}
+
+// ------------------------------------------
+// BADGE UPDATE
+// ------------------------------------------
+function updateBadge() {
+    const badge = document.getElementById('notificationBadge');
+    if (!badge) return;
+
+    const unread = notifications.filter(n => !n.read).length;
+    badge.hidden = unread === 0;
+    badge.textContent = unread > 99 ? '99+' : unread;
+}
+
+// ------------------------------------------
+// TIME FORMATTING
+// ------------------------------------------
+
+function formatTimeAgo(timestamp) {
+    if (!timestamp) return '';
+
+    const now = new Date();
+    const date = new Date(timestamp);
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (isNaN(seconds) || seconds < 0) return '';
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+
+    return date.toLocaleDateString();
+}
+
+// ------------------------------------------
+// POLLING CONTROL
+// ------------------------------------------
+
+function startNotificationPolling() {
+    stopNotificationPolling();
+    loadNotifications(true);
+    notificationPollingInterval = setInterval(() => loadNotifications(), 30000);
+}
+
+function stopNotificationPolling() {
+    if (notificationPollingInterval) {
+        clearInterval(notificationPollingInterval);
+        notificationPollingInterval = null;
+    }
+}
+
+
+// ------------------------------------------
+// MODAL HANDLERS
+// ------------------------------------------
+
+function openNotificationModal() {
+    const modal = document.getElementById('notificationModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    document.body.classList.add('no-scroll');
+    loadNotifications();
+}
+
+function closeNotificationModal() {
+    const modal = document.getElementById('notificationModal');
+    if (!modal) return;
+
+    modal.style.display = 'none';
+    document.body.classList.remove('no-scroll');
+}
+
+// ------------------------------------------
+// INIT (ADMIN DASHBOARD ONLY)
+// ------------------------------------------
+
+if (document.body.classList.contains('admin-dashboard-page')) {
+    document.addEventListener('DOMContentLoaded', startNotificationPolling);
+    document.addEventListener('visibilitychange', () => {
+        document.hidden ? stopNotificationPolling() : startNotificationPolling();
+    });
+}

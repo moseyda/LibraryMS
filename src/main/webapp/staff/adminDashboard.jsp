@@ -79,6 +79,23 @@
                 <%= adminUsername %> (<%= adminRole %>)
 
             </div>
+
+            <!-- Notification Trigger -->
+            <div class="notification-wrapper">
+                <button id="notificationBell" class="notification-bell" type="button" aria-label="Notifications" onclick="openNotificationModal()">
+        <span class="notification-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+        </span>
+                    <span id="notificationBadge" class="notification-badge" aria-live="polite" hidden>0</span>
+                </button>
+            </div>
+
+
+
+
             <a href="<%= request.getContextPath() %>/logout" id="logout">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
@@ -184,7 +201,23 @@
 </section>
 
 
-
+<!-- Notification Modal -->
+<div id="notificationModal" class="modal notification-modal" role="dialog" aria-modal="true" aria-labelledby="notificationModalTitle">
+    <div class="modal-content notification-modal-content">
+        <div class="modal-header">
+            <h2 id="notificationModalTitle">Notifications</h2>
+            <button class="modal-close" type="button" aria-label="Close" onclick="closeNotificationModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="notification-actions-bar">
+                <button class="btn-mark-all" type="button" onclick="markAllAsRead()">Mark all as read</button>
+            </div>
+            <div id="notificationList" class="notification-list-modal">
+                <div class="notification-empty">No notifications</div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <div class="admin-container">
@@ -450,6 +483,11 @@
 <section class="admin-container">
     <div class="admin-header">
         <h1>🕓 Loans Activity</h1>
+        <button onclick="openStudentHistoryModal()"
+                class="btn-secondary"
+                style="display:flex;align-items:center;gap:0.5rem;">
+            🔍  Student-Specific History
+        </button>
     </div>
 
     <div class="books-table-container">
@@ -692,12 +730,9 @@
     }
 
 
+
+
 </script>
 <script src="<%= request.getContextPath() %>/scripts/scripts.js"></script>
-
-
-
-
-
 </body>
 </html>

@@ -18,6 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 @WebServlet(name = "student.Login", value = "/login")
 public class Login extends HttpServlet {
 
@@ -62,23 +64,27 @@ public class Login extends HttpServlet {
             MongoDatabase database = mongo.getDatabase("dbLibraryMS");
             MongoCollection<Document> collection = database.getCollection("Students");
 
-            Document query = new Document()
-                    .append("SNumber", snumber)
-                    .append("Password", password);
-
+            Document query = new Document("SNumber", snumber);
             Document user = collection.find(query).first();
 
             if (user != null) {
-                System.out.println("User authenticated: " + user.getString("FName") + " " + user.getString("LName"));
-                return new String[]{
-                        user.getString("FName"),
-                        user.getString("LName"),
-                        user.getString("SNumber")
-                };
-            } else {
-                System.out.println("Authentication failed for Student Number: " + snumber);
-                return null;
+                String storedHashedPassword = user.getString("Password");
+
+                if (BCrypt.checkpw(password, storedHashedPassword)) {
+                    System.out.println("User authenticated: " +
+                            user.getString("FName") + " " + user.getString("LName"));
+
+                    return new String[]{
+                            user.getString("FName"),
+                            user.getString("LName"),
+                            user.getString("SNumber")
+                    };
+                }
             }
+
+            System.out.println("Authentication failed for Student Number: " + snumber);
+            return null;
+
         } catch (Exception e) {
             System.err.println("Error during authentication: " + e.getMessage());
             e.printStackTrace();
@@ -87,25 +93,30 @@ public class Login extends HttpServlet {
     }
 
     private String[] authenticateUserSQL(String snumber, String password) {
-        String sql = "SELECT FName, LName, SNumber FROM Students WHERE SNumber = ? AND Password = ?";
+        String sql = "SELECT FName, LName, SNumber, Password FROM Students WHERE SNumber = ?";
 
         try (Connection conn = SQLClientProvider.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, snumber);
-            stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                String fname = rs.getString("FName");
-                String lname = rs.getString("LName");
-                String snum = rs.getString("SNumber");
-                System.out.println("User authenticated: " + fname + " " + lname);
-                return new String[]{fname, lname, snum};
-            } else {
-                System.out.println("Authentication failed for Student Number: " + snumber);
-                return null;
+                String storedHashedPassword = rs.getString("Password");
+
+                if (BCrypt.checkpw(password, storedHashedPassword)) {
+                    String fname = rs.getString("FName");
+                    String lname = rs.getString("LName");
+                    String snum = rs.getString("SNumber");
+
+                    System.out.println("User authenticated: " + fname + " " + lname);
+                    return new String[]{fname, lname, snum};
+                }
             }
+
+            System.out.println("Authentication failed for Student Number: " + snumber);
+            return null;
+
         } catch (SQLException e) {
             System.err.println("Error during authentication: " + e.getMessage());
             e.printStackTrace();
