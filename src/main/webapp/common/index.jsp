@@ -25,6 +25,7 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#services" class="nav-link">Services</a>
             <a href="#contact" class="nav-link">Contact</a>
+            <a href="${pageContext.request.contextPath}/src/main/webapp/staff/adminLogin.jsp" class="nav-link">Admin-Portal</a>
             <a href="<%= request.getContextPath() %>/src/main/webapp/student/login.jsp" class="nav-link">Sign In</a>
             <a href="<%= request.getContextPath() %>/src/main/webapp/student/registration.jsp" class="nav-btn">Get Started</a>
         </div>
@@ -51,7 +52,10 @@
                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
                     </svg>
                 </a>
-                <a href="#features" class="btn btn-secondary">
+                <a href="https://www.youtube.com/channel/UCNm5JbDCyZf4M3RE7Eqsmqg"
+                   class="btn btn-secondary"
+                   target="_blank"
+                   rel="noopener noreferrer">
                     <svg class="btn-icon-play" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M8 5v14l11-7z"/>
                     </svg>

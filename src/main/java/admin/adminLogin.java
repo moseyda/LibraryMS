@@ -63,7 +63,6 @@ public class adminLogin extends HttpServlet {
             MongoDatabase database = mongo.getDatabase("dbLibraryMS");
             MongoCollection<Document> collection = database.getCollection("Admin");
 
-            // Debug: Print what we're searching for
             System.out.println("=== Authentication Debug ===");
             System.out.println("Attempting to authenticate username: " + username);
             System.out.println("Password length: " + (password != null ? password.length() : "null"));
@@ -74,7 +73,7 @@ public class adminLogin extends HttpServlet {
                 System.out.println("Found admin document: " + doc.toJson());
             }
 
-            // Now search for the specific user
+            //  Search for the specific user
             Document userQuery = new Document("username", username);
             Document foundUser = collection.find(userQuery).first();
 

@@ -34,6 +34,11 @@ public class ExtendBorrow extends HttpServlet {
         response.setContentType("application/json");
 
         String borrowId = request.getParameter("borrowId");
+        if (borrowId == null || borrowId.isBlank()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\":\"Borrow record not found or already returned\"}");
+            return;
+        }
 
         try (PrintWriter out = response.getWriter()) {
             Object[] result;

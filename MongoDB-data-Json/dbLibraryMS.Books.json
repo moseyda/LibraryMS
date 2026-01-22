@@ -51,7 +51,7 @@
   "publisher": "Elysian Press",
   "publicationYear": 2018,
   "quantity": 2,
-  "available": 1,
+  "available": 2,
   "description": "An epic tale of magic, betrayal, and destiny in a kingdom lost to time."
 },
 {
@@ -65,7 +65,7 @@
   "publisher": "Starfield Books",
   "publicationYear": 2021,
   "quantity": 3,
-  "available": 2,
+  "available": 3,
   "description": "A gripping journey through time and space where every thread of fate is woven into a grand design."
 },
 {
@@ -93,7 +93,7 @@
   "publisher": "Galactic Horizons Publishing",
   "publicationYear": 2023,
   "quantity": 5,
-  "available": 4,
+  "available": 5,
   "description": "An interstellar adventure that takes the reader across galaxies to uncover lost civilizations."
 },
 {
@@ -107,7 +107,7 @@
   "publisher": "Cyberline Press",
   "publicationYear": 2024,
   "quantity": 4,
-  "available": 3,
+  "available": 4,
   "description": "A thought-provoking dive into the fusion of human consciousness and artificial intelligence."
 },
 {
@@ -121,7 +121,7 @@
   "publisher": "Stellar Ink",
   "publicationYear": 2023,
   "quantity": 2,
-  "available": 1,
+  "available": 2,
   "description": "A cosmic journey that questions humanity’s place among the stars and the voices that echo from beyond."
 },
 {
@@ -135,7 +135,7 @@
   "publisher": "Sahara House Publishing",
   "publicationYear": 2019,
   "quantity": 3,
-  "available": 2,
+  "available": 3,
   "description": "An expedition through endless deserts leads to ancient secrets buried beneath shifting sands."
 },
 {
@@ -149,7 +149,7 @@
   "publisher": "Blackwood Books",
   "publicationYear": 2021,
   "quantity": 5,
-  "available": 4,
+  "available": 5,
   "description": "A mathematician discovers a formula that could predict the future—and kill anyone who solves it."
 },
 {
@@ -163,7 +163,7 @@
   "publisher": "Elysian Bloom",
   "publicationYear": 2020,
   "quantity": 2,
-  "available": 1,
+  "available": 2,
   "description": "In a realm where flowers whisper and glass grows like vines, a young mage must restore the balance of life."
 },
 {
@@ -177,7 +177,7 @@
   "publisher": "QuantumLeaf Press",
   "publicationYear": 2022,
   "quantity": 6,
-  "available": 5,
+  "available": 6,
   "description": "A groundbreaking exploration of predictive models and the philosophical implications of machine foresight."
 },
 {
@@ -191,7 +191,7 @@
   "publisher": "Oceanic Tales Publishing",
   "publicationYear": 2017,
   "quantity": 3,
-  "available": 2,
+  "available": 3,
   "description": "Sailors brave uncharted waters to uncover a mythical sea that reflects the stars themselves."
 },
 {
@@ -205,7 +205,7 @@
   "publisher": "Neural Edge Publications",
   "publicationYear": 2024,
   "quantity": 4,
-  "available": 3,
+  "available": 4,
   "description": "As AI surpasses human intelligence, one scientist questions whether consciousness can ever be truly replicated."
 },
 {
@@ -219,7 +219,7 @@
   "publisher": "Midnight Lantern Press",
   "publicationYear": 2018,
   "quantity": 2,
-  "available": 1,
+  "available": 2,
   "description": "An ex-detective stumbles upon a machine capable of manipulating memories—and erasing guilt."
 },
 {
@@ -235,4 +235,32 @@
   "quantity": 5,
   "available": 5,
   "description": "A time-bending saga that pieces together humanity’s fractured future through glimpses of parallel worlds."
+},
+{
+  "_id": {
+    "$oid": "695e8e473065c1cd72f75930"
+  },
+  "title": "Demo New",
+  "author": "Admin",
+  "isbn": "222-888-999-12",
+  "category": "Reference",
+  "publisher": "Me",
+  "publicationYear": 2009,
+  "quantity": 10,
+  "available": 10,
+  "description": "This is a demo book after long time."
+},
+{
+  "_id": {
+    "$oid": "69703d852ab75fb3d93a1fe2"
+  },
+  "title": "Age of Ice",
+  "author": "Me",
+  "isbn": "212-1223-121-12",
+  "category": "Fantasy",
+  "publisher": "Me",
+  "publicationYear": 1900,
+  "quantity": 2,
+  "available": 2,
+  "description": "This is a test after a while."
 }]

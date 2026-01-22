@@ -1,3 +1,31 @@
+-- MySQL connection details --
+-- username: root --
+-- password: LibraryMS2026 --
+-- default connection url: jdbc:mysql://127.0.0.1:3306/dbLibraryMS --
+
+
+
+CREATE DATABASE IF NOT EXISTS dblibraryms
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE dblibraryms;
+
+
+CREATE TABLE IF NOT EXISTS admin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active TINYINT(1) DEFAULT 1
+    );
+
+INSERT INTO admin (username, password, role, created_at, is_active)
+VALUES ('admin', 'admin123', 'admin', '2025-11-09 00:00:00', 1);
+
+
+
 CREATE TABLE IF NOT EXISTS Books (
     book_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -9,7 +37,7 @@ CREATE TABLE IF NOT EXISTS Books (
     quantity INT NOT NULL,
     available INT NOT NULL,
     description TEXT
-);
+    );
 
 
 CREATE TABLE IF NOT EXISTS Students (

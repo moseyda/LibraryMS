@@ -52,9 +52,16 @@
   "SNumber": "1324354",
   "Password": "Edwards"
 },
-
 {
-  "//note": "This entry is for testing password hashing. The password in plain is 'Iamatest' if login is required.",
+  "_id": {
+    "$oid": "696ad51655099d87c2943310"
+  },
+  "FName": "leyla",
+  "LName": "Doe",
+  "SNumber": "1234567",
+  "Password": "Leyladoe"
+},
+{
   "_id": {
     "$oid": "696fda7d030ecbd2e4530126"
   },
@@ -62,4 +69,31 @@
   "LName": "PassHash",
   "SNumber": "0000000",
   "Password": "$2a$10$uVDs9RDiW5HrZxu7094s2ukDfpHG5NrcmYwYl4ahZBKM.tfQVVL92"
+},
+{
+  "_id": {
+    "$oid": "69703c9f12dc0772805915e9"
+  },
+  "FName": "Alice",
+  "LName": "Alison",
+  "SNumber": "1111111",
+  "Password": "$2a$10$0pY.MiSkOjn2Ul1KcFfjD.KUuTbA1Rgf.OQwgnDWcB0U/TNjLYbDS"
+},
+{
+  "_id": {
+    "$oid": "6971919c39854f8df1523b26"
+  },
+  "FName": "John",
+  "LName": "Doe",
+  "SNumber": "9911883",
+  "Password": "$2a$10$EaduCCvkJryEPFVxS4qgSOFWbw075H6lVEyAqzNLWE6mLlim09e6m"
+},
+{
+  "_id": {
+    "$oid": "697191df39854f8df1523b29"
+  },
+  "FName": "John",
+  "LName": "Doe",
+  "SNumber": "9911882",
+  "Password": "$2a$10$zKlcPK2VYMmShHuGdhC88eQ.7BN1t0.GKUeGK.7pu71elKrejQOhK"
 }]

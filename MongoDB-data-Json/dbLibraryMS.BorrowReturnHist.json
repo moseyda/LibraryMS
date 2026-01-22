@@ -439,4 +439,264 @@
     "$date": "2025-12-12T02:30:58.294Z"
   },
   "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "696427a22751b9ac4ef148d8"
+  },
+  "isbn": "978-1-555-6342-5",
+  "title": "Mysteries of the Abyss",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2026-01-11T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-12T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-11T22:43:58.313Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69644baf443e85d68ecb3834"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2026-01-12T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-13T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-12T01:17:38.241Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "696ad52955099d87c2943318"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "1234567",
+  "firstName": "leyla",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2026-01-17T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-18T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-17T00:17:48.560Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "696fd563c8fd418f78b56fa1"
+  },
+  "isbn": "33-131-13133",
+  "title": "Demo2",
+  "SNumber": "1234567",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2026-01-20T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-20T19:20:09.683Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "696fee17379b2f89a9153bc7"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "0000000",
+  "firstName": "HashTest",
+  "lastName": "PassHash",
+  "borrowDate": {
+    "$date": "2026-01-20T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-20T23:47:13.043Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "696ffe2948f2b142baf4c9f4"
+  },
+  "isbn": "33-131-13133",
+  "title": "Demo2",
+  "SNumber": "0000000",
+  "firstName": "HashTest",
+  "lastName": "PassHash",
+  "borrowDate": {
+    "$date": "2026-01-20T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-20T22:14:32.244Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69701a00454e458e074de2c5"
+  },
+  "isbn": "33-131-13133",
+  "title": "Demo2",
+  "SNumber": "0000000",
+  "firstName": "HashTest",
+  "lastName": "PassHash",
+  "borrowDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-22T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-21T00:13:07.202Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69701a4d454e458e074de2f8"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "0000000",
+  "firstName": "HashTest",
+  "lastName": "PassHash",
+  "borrowDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-22T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-21T00:14:39.543Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69701a4f454e458e074de2fd"
+  },
+  "isbn": "978-1-4028-9462-6",
+  "title": "The Secrets of the Quantum Realm",
+  "SNumber": "0000000",
+  "firstName": "HashTest",
+  "lastName": "PassHash",
+  "borrowDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-22T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-21T00:14:41.152Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69703cbc12dc0772805915f0"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "1111111",
+  "firstName": "Alice",
+  "lastName": "Alison",
+  "borrowDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-23T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-21T02:43:04.809Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "69703d402ab75fb3d93a1fcc"
+  },
+  "isbn": "33-131-13133",
+  "title": "Demo2",
+  "SNumber": "1111111",
+  "firstName": "Alice",
+  "lastName": "Alison",
+  "borrowDate": {
+    "$date": "2026-01-21T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-23T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-21T02:44:46.271Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6971928839854f8df1523b2f"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "9911882",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2026-01-22T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-24T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-22T03:01:48.396Z"
+  },
+  "status": "returned"
+},
+{
+  "_id": {
+    "$oid": "6971932739854f8df1523b3e"
+  },
+  "isbn": "22-121-12122",
+  "title": "Demo",
+  "SNumber": "9911882",
+  "firstName": "John",
+  "lastName": "Doe",
+  "borrowDate": {
+    "$date": "2026-01-22T00:00:00.000Z"
+  },
+  "expectedReturnDate": {
+    "$date": "2026-01-24T00:00:00.000Z"
+  },
+  "actualReturnDate": {
+    "$date": "2026-01-22T03:02:10.766Z"
+  },
+  "status": "returned"
 }]

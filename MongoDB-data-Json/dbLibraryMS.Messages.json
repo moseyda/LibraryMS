@@ -57,4 +57,28 @@
   "timestamp": {
     "$date": "2025-11-22T04:12:52.019Z"
   }
+},
+{
+  "_id": {
+    "$oid": "69703df62ab75fb3d93a1ff6"
+  },
+  "studentNumber": "1111111",
+  "name": "Alice",
+  "subject": "Test Message MongoDB",
+  "message": "This is a test message for admin notifications through MongoDB",
+  "timestamp": {
+    "$date": "2026-01-21T02:46:14.297Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69703f7c2ab75fb3d93a200e"
+  },
+  "studentNumber": "1111111",
+  "name": "Alice",
+  "subject": "Test Message MongoDB",
+  "message": "Again.",
+  "timestamp": {
+    "$date": "2026-01-21T02:52:44.414Z"
+  }
 }]

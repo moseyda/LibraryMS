@@ -21,3 +21,5 @@ Once all files are imported, you will have a fully populated MongoDB database re
 ** Note: It's mandatory for this project to create the database with the name "dbLibraryMS" and one collection;
 ** At least the "Admin" collection should be created as the credentials for the admin is predefined in the application code.
 --> Failure to do so may result in authentication issues when accessing the admin interface.
+** Other collection names should match the file names for consistency and to avoid confusion.
+For safety and avoid potential errors, please import all collections as provided. in this directory.
