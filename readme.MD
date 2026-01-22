@@ -6,13 +6,13 @@ A project implementing a Library Management System with admin dashboard and stud
 
 ## Tech stack
 - Java (servlets)
-- Maven (\`mvnw.cmd\` for Windows)
+- Maven
 - MongoDB
-- (Optional - not favoured) Docker / Docker Compose
+- MySQL
 
 ## Prerequisites (Must be exactly as below)
 - JDK 21.0.3 => https://download.oracle.com/java/21/archive/jdk-21.0.3_windows-x64_bin.zip
-- Maven (or use \`.\mvnw.cmd\`)
+- Maven 
 - MongoDB running at \`mongodb://localhost:27017\`
 - MySQL, preferably MySQL Workbench (latest version) running at \`localhost:3306\`
 - IntelliJ IDEA (recommended for running/deploying)
@@ -20,14 +20,8 @@ A project implementing a Library Management System with admin dashboard and stud
 
 ## Quick start
 
-1. Build:
-    - Windows (wrapper):  
-      \`\`\`powershell
-      .\mvnw.cmd clean package -DskipTests
-      \`\`\`
-    - Or: \`mvn clean package\`
 
-2. Run in IDE:
+1. Run in IDE:
     - Deploy built WAR to Tomcat or run via your IDE run configuration as follows:
     - In IntelliJ IDEA, go to Run > Edit Configurations > + > Tomcat Server > Local.
     - Under Deployment tab, click + > Artifact > select \`LibraryMS`\.
